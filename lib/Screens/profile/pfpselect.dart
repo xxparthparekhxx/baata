@@ -1,0 +1,213 @@
+
+import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart'; 
+import 'package:http/http.dart'as http;
+
+
+import 'dart:convert';
+
+
+
+class Pfp extends StatefulWidget {
+  final String userName;
+  final User profile; 
+  final PageController controller;
+  const Pfp({Key? key,required this.userName ,required this.profile,required this.controller});
+
+  @override
+  _PfpState createState() => _PfpState();
+}
+
+enum AppState {
+  free,
+  picked,
+  cropped,
+}
+
+class _PfpState extends State<Pfp> {
+  late AppState state;
+  File? imageFile;
+
+  @override
+  void initState() {
+    super.initState();
+    state = AppState.free;
+
+  }
+  void _uploadFile() async{
+    
+
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse("http://192.168.1.69:5000/profile/upload"),
+    );
+    Map<String, String> headers = {"Content-type": "multipart/form-data","jwt":await widget.profile.getIdToken()};
+    request.files.add(
+      http.MultipartFile(
+        'image',
+        imageFile!.readAsBytes().asStream(),
+        imageFile!.lengthSync(),
+        
+        filename:widget.userName +"|||DeLimitMe|||"+imageFile!.path.split('/').last.split('.').last)
+        
+    
+    );
+    request.headers.addAll(headers);
+    print("request: " + request.toString());
+    var res = await request.send();
+    http.Response response = await http.Response.fromStream(res);
+    if (response.statusCode == 200){
+      widget.controller.animateToPage(2, duration: const Duration(milliseconds: 500), curve: Curves.ease);
+    }
+
+  }
+
+
+  Widget customButton(String text,Color c,Color tc,bool pic){
+    return     
+    ElevatedButton(onPressed: pic?()=>imageFile == null ?_pickImage(): _uploadFile():(){
+      setState(() {    
+      imageFile = null;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: const Text("You are Retarded")));
+    }, child: pic? 
+          Text(text): Padding(padding: const EdgeInsets.symmetric(horizontal:20),
+    child: Text(text),),
+    style: ElevatedButton.styleFrom(primary:  c));
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            imageFile != null
+            ? Container(
+              height: 200,
+              width: 200,
+              child: Stack(
+                children: [
+                  CircleAvatar(
+                    foregroundImage: FileImage(imageFile!),
+                    radius: 200,
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+
+                            height: 50,
+                            width: 50,
+                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(100),color: Colors.orange),
+                          child: InkWell(
+                            radius: 100,
+                            onTap: (){_cropImage();},
+                            child: const Icon(Icons.crop_free_sharp),
+                          
+                          )),
+                        ],
+                      ),
+                    ],
+                  )
+                  ]
+              ),
+            )
+            : Container(
+              child: const CircleAvatar(
+                foregroundImage: NetworkImage("https://upload.wikimedia.org/wikipedia/en/1/1b/NPC_wojak_meme.png"),
+                radius: 100,
+              ),
+            ),
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Text(widget.userName),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical:  10.0),
+                child: const Text("Add a Profile Photo"),
+              )
+              ,
+              customButton(imageFile == null ?"Custom Profile Photo":"Select This Photo", Colors.orange,Colors.black,true),
+              const Padding(padding: const EdgeInsets.all(10)) ,
+              customButton(imageFile == null?"Remain a NPC":"Reset", Colors.black,Colors.white,false),
+            ],
+          ),
+
+            ])
+      ),
+    );
+  }
+
+
+
+  Future<Null> _pickImage() async {
+    final pickedImage =
+        await ImagePicker().getImage(source: ImageSource.gallery);
+    imageFile = pickedImage != null ? File(pickedImage.path) : imageFile;
+    if (imageFile != null) {
+      setState(() {
+        state = AppState.picked;
+      });
+      _cropImage();
+    }
+  }
+
+  Future<Null> _cropImage() async {
+    File? croppedFile = await ImageCropper.cropImage(
+        sourcePath: imageFile!.path,
+        aspectRatioPresets: Platform.isAndroid
+            ? [
+                CropAspectRatioPreset.square,
+                CropAspectRatioPreset.ratio3x2,
+                CropAspectRatioPreset.original,
+                CropAspectRatioPreset.ratio4x3,
+                CropAspectRatioPreset.ratio16x9
+              ]
+            : [
+                CropAspectRatioPreset.original,
+                CropAspectRatioPreset.square,
+                CropAspectRatioPreset.ratio3x2,
+                CropAspectRatioPreset.ratio4x3,
+                CropAspectRatioPreset.ratio5x3,
+                CropAspectRatioPreset.ratio5x4,
+                CropAspectRatioPreset.ratio7x5,
+                CropAspectRatioPreset.ratio16x9
+              ],
+        androidUiSettings: const AndroidUiSettings(
+            toolbarTitle: 'Resize your image',
+            toolbarColor: Colors.orange,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false
+            showCropGrid: false
+            ),
+        iosUiSettings: const IOSUiSettings(
+          title: 'Resize Your Image',
+        ));
+    if (croppedFile != null) {
+      imageFile = croppedFile;
+      setState(() {
+        state = AppState.cropped;
+      });
+    }
+
+  }
+
+  void _clearImage() {
+    imageFile = null;
+    setState(() {
+      state = AppState.free;
+    });
+  }
+}
