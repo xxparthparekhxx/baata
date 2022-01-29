@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 class ViewImage extends StatefulWidget {
   final String url;
   final String Tag;
-  const ViewImage({Key? key, required this.url, required this.Tag})
+  final String Token;
+  const ViewImage(
+      {Key? key, required this.url, required this.Tag, required this.Token})
       : super(key: key);
 
   @override
@@ -21,7 +23,10 @@ class _ViewImageState extends State<ViewImage> {
         child: Center(
           child: Hero(
             tag: "photo" + widget.Tag,
-            child: NetworkImg(url: widget.url),
+            child: NetworkImg(
+              url: widget.url,
+              Token: widget.Token,
+            ),
           ),
         ),
       ),

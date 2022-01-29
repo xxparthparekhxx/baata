@@ -259,6 +259,7 @@ class _MessagePageState extends State<MessagePage> {
                                                   context, MaterialPageRoute(
                                                       builder: (c) {
                                                 return ViewImage(
+                                                    Token: widget.Token,
                                                     Tag: index.toString(),
                                                     url:
                                                         "http://192.168.1.69:5000/messageimage/id=${widget.messageId}&i=$index");
@@ -272,6 +273,7 @@ class _MessagePageState extends State<MessagePage> {
                                                     tag: "photo" +
                                                         index.toString(),
                                                     child: NetworkImg(
+                                                      Token: widget.Token,
                                                       url:
                                                           "http://192.168.1.69:5000/messageimage/id=${widget.messageId}&i=$index",
                                                     ),

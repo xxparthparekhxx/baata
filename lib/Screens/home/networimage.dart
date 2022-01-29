@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 
 class NetworkImg extends StatefulWidget {
   final String url;
-  const NetworkImg({Key? key, required this.url}) : super(key: key);
+  final String Token;
+  const NetworkImg({Key? key, required this.url, required this.Token})
+      : super(key: key);
 
   @override
   State<NetworkImg> createState() => _NetworkImgState();
@@ -22,6 +24,7 @@ class _NetworkImgState extends State<NetworkImg> {
     return CachedNetworkImage(
       fadeInDuration: const Duration(days: 0),
       imageUrl: widget.url,
+      httpHeaders: {"jwt": widget.Token},
       // progressIndicatorBuilder: (context, url, downloadProgress) => Container(
       //     color: Colors.black,
       //     height: 175,
