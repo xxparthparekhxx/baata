@@ -6,7 +6,8 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:http/http.dart';
 
 class ContactSelector extends StatefulWidget {
-  ContactSelector({Key? key}) : super(key: key);
+  final Function updatehome;
+  const ContactSelector({Key? key, required this.updatehome}) : super(key: key);
 
   @override
   _ContactSelectorState createState() => _ContactSelectorState();
@@ -60,7 +61,7 @@ class _ContactSelectorState extends State<ContactSelector> {
                   ContactList![index]
                       .displayName
                       .toLowerCase()
-                      .contains(SearchController.value.text.toLowerCase())) {
+                      .contains(SearchController.text.toLowerCase())) {
                 String Phonenumber = ContactList![index]
                     .phones
                     .elementAt(0)
@@ -73,10 +74,12 @@ class _ContactSelectorState extends State<ContactSelector> {
                 }
                 Contact cc = ContactList![index];
                 return contactTile(
-                    DisplayName: cc.displayName,
-                    PhoneNumber: Phonenumber,
-                    Token: idToken!,
-                    uid: uid);
+                  DisplayName: cc.displayName,
+                  PhoneNumber: Phonenumber,
+                  Token: idToken!,
+                  uid: uid,
+                  updatehome: widget.updatehome,
+                );
               } else {
                 return const SizedBox();
               }

@@ -35,7 +35,7 @@ class _UserHomeState extends State<UserHome> {
   void FetchuserMessages() async {
     token = await widget.user.getIdToken();
     http.Response res = await http.get(Uri.parse(
-        "http://192.168.1.69:5000/profile/getMessage/metadata/jwt=$token"));
+        "http://192.168.1.69:80/profile/getMessage/metadata/jwt=$token"));
     MessageList = jsonDecode(res.body);
     setState(() {});
   }
@@ -52,7 +52,7 @@ class _UserHomeState extends State<UserHome> {
   void updateMessagingToken() async {
     String messagingtoken = await messaging.getToken() ?? "";
     http.Response res = await http.post(
-        Uri.parse("http://192.168.1.69:5000/profile/SetFmcToken"),
+        Uri.parse("http://192.168.1.69:80/profile/SetFmcToken"),
         body: jsonEncode({"Fmc": messagingtoken}),
         headers: {"jwt": token!});
     print(messagingtoken);
@@ -78,6 +78,7 @@ class _UserHomeState extends State<UserHome> {
         user: widget.user,
         ThemeSetter: widget.ThemeSetter,
         ct: widget.ct,
+        updatehome: FetchuserMessages,
       )),
       appBar: AppBar(
         actions: const [
@@ -129,7 +130,8 @@ class _UserHomeState extends State<UserHome> {
                                   radius: 30,
                                   backgroundColor: Colors.black,
                                   foregroundImage: NetworkImage(
-                                      "http://192.168.1.69:5000/profile/get/jwt=$token&uid=$sender"),
+                                      "http://192.168.1.69:80/profile/get/jwt=$token&uid=$sender",
+                                      headers: {"Keep-Alive": "timeout=10"}),
                                 ),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(

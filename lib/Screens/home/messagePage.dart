@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-
-import 'dart:typed_data';
+import 'dart:io';
+import 'package:baata/Screens/home/videoinChat.dart';
+import 'package:http/http.dart' as http;
 import 'package:baata/Screens/home/networimage.dart';
+
 import 'package:baata/Screens/home/viewimage.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:baata/Screens/home/displayphoto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -13,11 +14,11 @@ import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 
 class MessagePage extends StatefulWidget {
-  String Senderuid;
-  String messageId;
-  String SenderName;
-  String Token;
-  MessagePage(
+  final String Senderuid;
+  final String messageId;
+  final String SenderName;
+  final String Token;
+  const MessagePage(
       {Key? key,
       required this.messageId,
       required this.Senderuid,
@@ -50,7 +51,7 @@ class _MessagePageState extends State<MessagePage> {
 
   void UpdateMessagesWithId(id) async {
     Response res = await post(
-        Uri.parse('http://192.168.1.69:5000/getMessageFormid'),
+        Uri.parse('http://192.168.1.69:80/getMessageFormid'),
         headers: {"jwt": widget.Token},
         body: jsonEncode({"id": id}));
 
@@ -62,7 +63,7 @@ class _MessagePageState extends State<MessagePage> {
 
   void StartMessaging(Map message) async {
     Response res = await post(
-        Uri.parse('http://192.168.1.69:5000/StartMessagingWithNewContact'),
+        Uri.parse('http://192.168.1.69:80/StartMessagingWithNewContact'),
         headers: {"jwt": widget.Token},
         body: jsonEncode(message));
 
@@ -74,7 +75,7 @@ class _MessagePageState extends State<MessagePage> {
       required String textmessage,
       required bool isMedia}) async {
     Response res =
-        await post(Uri.parse('http://192.168.1.69:5000/postMessageToId'),
+        await post(Uri.parse('http://192.168.1.69:80/postMessageToId'),
             headers: {"jwt": widget.Token},
             body: jsonEncode({
               "id": id,
@@ -86,7 +87,7 @@ class _MessagePageState extends State<MessagePage> {
     UpdateMessagesWithId(id);
   }
 
-  void displayimage(XFile image) {
+  void displayimage(final XFile image) {
     Navigator.push(context, MaterialPageRoute(builder: (c) {
       return displayphoto(
         image: image,
@@ -97,10 +98,50 @@ class _MessagePageState extends State<MessagePage> {
     })).then((value) => UpdateMessagesWithId(widget.messageId));
   }
 
-  void displayvideo(image) {
-    Navigator.push(context, MaterialPageRoute(builder: (c) {
-      return Scaffold(appBar: AppBar(), body: null);
-    }));
+  void sendVideotoid(
+      {required final String id, required final String Path}) async {
+    int idx = ChatMessages!.length;
+    ChatMessages!.add(
+        {"Sender": selfUid, "isMedia": true, "MediaType": "Video", "up": ''});
+    setState(() {});
+
+    await Future.delayed(const Duration(milliseconds: 50));
+    jupmtobottom();
+    File video = File(Path);
+
+    final http.MultipartRequest request = http.MultipartRequest(
+      'POST',
+      Uri.parse("http://192.168.1.69:80/PostVideoToId"),
+    );
+    final Map<String, String> headers = {
+      "Content-type": "multipart/form-data",
+      "jwt": widget.Token
+    };
+    final Map<String, Object> meta = {
+      "id": id,
+      "Sender": selfUid,
+      "messageTime": DateTime.now().millisecondsSinceEpoch,
+      "MessageText": Message.text,
+      "isMedia": true,
+      "MediaType": "Video"
+    };
+    request.fields['data'] = jsonEncode(meta);
+    request.files.add(http.MultipartFile(
+        'video', video.readAsBytes().asStream(), video.lengthSync(),
+        filename: video.path.split("/").last.split(".").last));
+
+    request.headers.addAll(headers);
+    var res = await request.send();
+    http.Response response = await http.Response.fromStream(res);
+    if (response.statusCode == 200) {
+      if (idx > ChatMessages!.length) {
+        ChatMessages!.removeLast();
+      } else {
+        ChatMessages!.removeAt(idx);
+      }
+      setState(() {});
+      UpdateMessagesWithId(id);
+    }
   }
 
   void prompToPickImage() {
@@ -108,20 +149,20 @@ class _MessagePageState extends State<MessagePage> {
         context: context,
         builder: (con) => Column(mainAxisSize: MainAxisSize.min, children: [
               ListTile(
-                // Pick video Gallery
-                contentPadding: EdgeInsets.all(10),
+                // Pick video Camera
+                contentPadding: const EdgeInsets.all(10),
                 onTap: () async {
                   XFile? file = await ImagePicker().pickVideo(
                       source: ImageSource.camera,
-                      maxDuration: Duration(hours: 3));
+                      maxDuration: const Duration(hours: 3));
                   if (file != null) {}
                 },
-                leading: Icon(Icons.video_collection),
-                title: Text("Video"),
+                leading: const Icon(Icons.video_collection),
+                title: const Text("Video"),
               ),
               ListTile(
                 // Pick Image camera
-                contentPadding: EdgeInsets.all(10),
+                contentPadding: const EdgeInsets.all(10),
                 onTap: () async {
                   XFile? file =
                       await ImagePicker().pickImage(source: ImageSource.camera);
@@ -129,24 +170,27 @@ class _MessagePageState extends State<MessagePage> {
                     displayimage(file);
                   }
                 },
-                leading: Icon(Icons.photo),
-                title: Text("Photo"),
+                leading: const Icon(Icons.photo),
+                title: const Text("Photo"),
               ),
               ListTile(
                 // Pick video Gallery
-                contentPadding: EdgeInsets.all(10),
+                contentPadding: const EdgeInsets.all(10),
                 onTap: () async {
                   XFile? file = await ImagePicker().pickVideo(
                       source: ImageSource.gallery,
-                      maxDuration: Duration(hours: 3));
-                  if (file != null) {}
+                      maxDuration: const Duration(hours: 3));
+                  if (file != null) {
+                    sendVideotoid(id: widget.messageId, Path: file.path);
+                  }
+                  Navigator.pop(context);
                 },
-                leading: Icon(Icons.video_call_sharp),
-                title: Text("Video (Gallery)"),
+                leading: const Icon(Icons.video_call_sharp),
+                title: const Text("Video (Gallery)"),
               ),
               ListTile(
                 // Pick Image Gallery
-                contentPadding: EdgeInsets.all(10),
+                contentPadding: const EdgeInsets.all(10),
                 onTap: () async {
                   XFile? file = await ImagePicker()
                       .pickImage(source: ImageSource.gallery);
@@ -154,47 +198,75 @@ class _MessagePageState extends State<MessagePage> {
                     displayimage(file);
                   }
                 },
-                leading: Icon(Icons.photo),
-                title: Text("Photo (Gallery)"),
+                leading: const Icon(Icons.photo),
+                title: const Text("Photo (Gallery)"),
               ),
             ]));
   }
 
   void jupmtobottom() async {
+    await Future.delayed(const Duration(milliseconds: 20));
     bool scrolled = false;
-    while (!scrolled || sSindexSs != ChatMessages!.length - 1) {
+    while (
+        MIController.position.pixels != MIController.position.maxScrollExtent &&
+            mounted) {
       try {
-        await Future.delayed(const Duration(milliseconds: 100));
-        MIController.jumpTo(MIController.position.maxScrollExtent);
-        scrolled = !scrolled;
+        MIController.animateTo(MIController.position.maxScrollExtent,
+            curve: Curves.ease, duration: const Duration(milliseconds: 10));
+        await Future.delayed(const Duration(milliseconds: 20));
       } catch (e) {
-        print("ERROR WAS $e");
+        break;
       }
     }
+  }
+
+  BoxDecoration messagebubble(index) {
+    return BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(20),
+          topRight: const Radius.circular(20),
+          bottomRight: ChatMessages![index]['Sender'] == selfUid
+              ? const Radius.circular(0)
+              : const Radius.circular(20),
+          bottomLeft: ChatMessages![index]['Sender'] == selfUid
+              ? const Radius.circular(20)
+              : const Radius.circular(0),
+        ));
+  }
+
+  void DisplayHeroPhoto(index) {
+    Navigator.push(context, MaterialPageRoute(builder: (c) {
+      return ViewImage(
+          Token: widget.Token,
+          Tag: index.toString(),
+          url:
+              "http://192.168.1.69:80/messageimage/id=${widget.messageId}&i=$index");
+    }));
   }
 
   @override
   void dispose() {
     listener!.cancel();
     listener = null;
-    // TODO: implement dispose
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     listener;
+
     double query = MediaQuery.of(context).viewInsets.bottom;
     if (query != 0) {
       MIController.jumpTo(MIController.position.maxScrollExtent);
     }
-
+// "MediaType" Image
     return Scaffold(
         appBar: AppBar(
             title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
           CircleAvatar(
             foregroundImage: NetworkImage(
-                "http://192.168.1.69:5000/profile/get/jwt=${widget.Token}&uid=${widget.Senderuid}"),
+                "http://192.168.1.69:80/profile/get/jwt=${widget.Token}&uid=${widget.Senderuid}"),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -220,6 +292,7 @@ class _MessagePageState extends State<MessagePage> {
                             cacheExtent: ChatMessages!.length.toDouble(),
                             itemBuilder: (BuildContext context, int index) {
                               sSindexSs = index;
+
                               return Row(
                                 mainAxisAlignment:
                                     ChatMessages![index]['Sender'] == selfUid
@@ -227,106 +300,83 @@ class _MessagePageState extends State<MessagePage> {
                                         : MainAxisAlignment.start,
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: ChatMessages![index]['isMedia']
-                                        ? Container(
-                                            decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft:
-                                                      const Radius.circular(20),
-                                                  topRight:
-                                                      const Radius.circular(20),
-                                                  bottomRight: ChatMessages![
-                                                                  index]
-                                                              ['Sender'] ==
-                                                          selfUid
-                                                      ? const Radius.circular(0)
-                                                      : const Radius.circular(
-                                                          20),
-                                                  bottomLeft: ChatMessages![
-                                                                  index]
-                                                              ['Sender'] ==
-                                                          selfUid
-                                                      ? const Radius.circular(
-                                                          20)
-                                                      : const Radius.circular(
-                                                          0),
-                                                )),
-                                            padding: const EdgeInsets.all(10),
-                                            child: GestureDetector(
-                                              onTap: () => Navigator.push(
-                                                  context, MaterialPageRoute(
-                                                      builder: (c) {
-                                                return ViewImage(
-                                                    Token: widget.Token,
-                                                    Tag: index.toString(),
-                                                    url:
-                                                        "http://192.168.1.69:5000/messageimage/id=${widget.messageId}&i=$index");
-                                              })),
-                                              child: ConstrainedBox(
-                                                  constraints:
-                                                      const BoxConstraints(
-                                                          maxHeight: 175,
-                                                          maxWidth: 200),
-                                                  child: Hero(
-                                                    tag: "photo" +
-                                                        index.toString(),
-                                                    child: NetworkImg(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: ChatMessages![index]['isMedia']
+                                          ? ChatMessages![index]['MediaType'] ==
+                                                  "Image"
+                                              ? Container(
+                                                  decoration:
+                                                      messagebubble(index),
+                                                  padding:
+                                                      const EdgeInsets.all(10),
+                                                  child: GestureDetector(
+                                                    onTap: () =>
+                                                        DisplayHeroPhoto(index),
+                                                    child: ConstrainedBox(
+                                                        constraints:
+                                                            const BoxConstraints(
+                                                                maxHeight: 175,
+                                                                maxWidth: 200),
+                                                        child: Hero(
+                                                          tag: "photo" +
+                                                              index.toString(),
+                                                          child: NetworkImg(
+                                                            Token: widget.Token,
+                                                            url:
+                                                                "http://192.168.1.69:80/messageimage/id=${widget.messageId}&i=$index",
+                                                          ),
+                                                        )),
+                                                  ),
+                                                )
+                                              : ChatMessages![index]
+                                                      .keys
+                                                      .contains("up")
+                                                  ? Container(
+                                                      width: 200,
+                                                      height: 200,
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10),
+                                                      decoration:
+                                                          messagebubble(index),
+                                                      child: Container(
+                                                        color: Colors.black,
+                                                        child: const Center(
+                                                            child:
+                                                                const CircularProgressIndicator()),
+                                                      ),
+                                                    )
+                                                  : VideoInChat(
                                                       Token: widget.Token,
-                                                      url:
-                                                          "http://192.168.1.69:5000/messageimage/id=${widget.messageId}&i=$index",
-                                                    ),
-                                                  )),
-                                            ),
-                                          )
-                                        : Container(
-                                            decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft:
-                                                      const Radius.circular(20),
-                                                  topRight:
-                                                      const Radius.circular(20),
-                                                  bottomRight: ChatMessages![
-                                                                  index]
-                                                              ['Sender'] ==
-                                                          selfUid
-                                                      ? const Radius.circular(0)
-                                                      : const Radius.circular(
-                                                          20),
-                                                  bottomLeft: ChatMessages![
-                                                                  index]
-                                                              ['Sender'] ==
-                                                          selfUid
-                                                      ? const Radius.circular(
-                                                          20)
-                                                      : const Radius.circular(
-                                                          0),
-                                                )),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(10.0),
-                                              child: Text(
-                                                ChatMessages![index]
-                                                        ['MessageText'] ??
-                                                    ChatMessages![index]
-                                                        ["messageText"],
-                                                style: const TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 20),
+                                                      decoration:
+                                                          messagebubble(index),
+                                                      index: index,
+                                                      messageId:
+                                                          widget.messageId,
+                                                    )
+                                          : Container(
+                                              decoration: messagebubble(index),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(10.0),
+                                                child: Text(
+                                                  ChatMessages![index]
+                                                          ['MessageText'] ??
+                                                      ChatMessages![index]
+                                                          ["messageText"],
+                                                  style: const TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 20),
+                                                ),
                                               ),
-                                            ),
-                                          ),
-                                  )
+                                            ))
                                 ],
                               );
                             },
                           ),
                         )
-                      : const Center(child: const Text("Start  Messaging")),
-                  Container(
-                      child: Row(
+                      : const Center(child: Text("Start  Messaging")),
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
@@ -337,9 +387,9 @@ class _MessagePageState extends State<MessagePage> {
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: Row(
                             children: [
-                              SizedBox(width: 10),
+                              const SizedBox(width: 10),
                               TextField(
-                                style: TextStyle(color: Colors.black),
+                                style: const TextStyle(color: Colors.black),
                                 controller: Message,
                                 decoration: InputDecoration(
                                     border: InputBorder.none,
@@ -395,7 +445,7 @@ class _MessagePageState extends State<MessagePage> {
                         ),
                       )
                     ],
-                  )),
+                  ),
                   const SizedBox(
                     height: 10,
                   )

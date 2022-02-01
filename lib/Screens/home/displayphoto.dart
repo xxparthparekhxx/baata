@@ -35,7 +35,7 @@ class _displayphotoState extends State<displayphoto> {
   void sendImagetoid({required String id, required File Image}) async {
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse("http://192.168.1.69:5000/PostImageToId"),
+      Uri.parse("http://192.168.1.69:80/PostImageToId"),
     );
     Map<String, String> headers = {
       "Content-type": "multipart/form-data",

@@ -42,7 +42,7 @@ class _PfpState extends State<Pfp> {
 
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse("http://192.168.1.69:5000/profile/upload"),
+      Uri.parse("http://192.168.1.69:80/profile/upload"),
     );
     Map<String, String> headers = {"Content-type": "multipart/form-data","jwt":await widget.profile.getIdToken()};
     request.files.add(

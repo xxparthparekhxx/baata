@@ -122,6 +122,7 @@ class loginflowState extends State<loginflow> {
                 Settings: Settings!,
                 ThemeSetter: widget.ThemeSetter,
                 ct: widget.ct,
+                updatehome: () {},
               )
             : SignInPage(authinstance: auth));
   }

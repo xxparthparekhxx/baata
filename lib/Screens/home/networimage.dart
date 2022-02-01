@@ -12,25 +12,12 @@ class NetworkImg extends StatefulWidget {
 }
 
 class _NetworkImgState extends State<NetworkImg> {
-  Image? image;
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return CachedNetworkImage(
       fadeInDuration: const Duration(days: 0),
       imageUrl: widget.url,
       httpHeaders: {"jwt": widget.Token},
-      // progressIndicatorBuilder: (context, url, downloadProgress) => Container(
-      //     color: Colors.black,
-      //     height: 175,
-      //     width: 200,
-      //     child:
-      //         CircularProgressIndicator(value: downloadProgress.progress))
     );
   }
 }

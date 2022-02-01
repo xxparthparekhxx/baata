@@ -12,12 +12,14 @@ class loggedinPage extends StatefulWidget {
   final uManager Settings;
   final Function ThemeSetter;
   final ThemeMode ct;
+  final Function updatehome;
   const loggedinPage(
       {Key? key,
       required this.profile,
       required this.Settings,
       required this.ThemeSetter,
-      required this.ct})
+      required this.ct,
+      required this.updatehome})
       : super(key: key);
   @override
   State<loggedinPage> createState() => _loggedinPageState();
@@ -29,8 +31,10 @@ class _loggedinPageState extends State<loggedinPage> {
   void updateState() {
     setState(() {});
     Navigator.of(context).push(MaterialPageRoute(builder: (c) {
-      return ContactSelector();
-    }));
+      return ContactSelector(
+        updatehome: widget.updatehome,
+      );
+    })).then((value) => setState(() {}));
   }
 
   @override

@@ -5,9 +5,12 @@ class ViewImage extends StatefulWidget {
   final String url;
   final String Tag;
   final String Token;
-  const ViewImage(
-      {Key? key, required this.url, required this.Tag, required this.Token})
-      : super(key: key);
+  const ViewImage({
+    Key? key,
+    required this.url,
+    required this.Tag,
+    required this.Token,
+  }) : super(key: key);
 
   @override
   State<ViewImage> createState() => _ViewImageState();

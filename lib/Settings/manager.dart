@@ -26,18 +26,20 @@ class uManager {
   }
 
   Stream<UserStates> userDetails() async* {
-    const String Address = 'http://192.168.1.69:5000/';
+    const String Address = 'http://192.168.1.69:80/';
     String idtoken;
 
     idtoken = await person.getIdToken();
 
     http.Response? res;
     while (res == null || res.statusCode != 200) {
-      res = await rw(
-        url: Address + "profile/uudetails",
-        idtoken: idtoken,
-      );
-      await Future.delayed(Duration(seconds: 1));
+      try {
+        res = await rw(
+          url: Address + "profile/uudetails",
+          idtoken: idtoken,
+        );
+        await Future.delayed(Duration(seconds: 1));
+      } catch (e) {}
     }
 
     var userdata = jsonDecode(res.body);

@@ -7,7 +7,10 @@ import 'package:http/http.dart';
 class newMessageStart extends StatefulWidget {
   var data;
   String Token;
-  newMessageStart({Key? key, this.data, required this.Token}) : super(key: key);
+  Function updatehome;
+  newMessageStart(
+      {Key? key, this.data, required this.Token, required this.updatehome})
+      : super(key: key);
 
   @override
   _newMessageStartState createState() => _newMessageStartState();
@@ -21,15 +24,17 @@ class _newMessageStartState extends State<newMessageStart> {
   TextEditingController Message = TextEditingController();
 
   void GetMessages() async {
+    print('getMessages');
     var data = await get(
         Uri.parse(
-            'http://192.168.1.69:5000/GetChatFromUid/uid=${widget.data['uid']}'),
+            'http://192.168.1.69:80/GetChatFromUid/uid=${widget.data['uid']}'),
         headers: {"jwt": widget.Token});
+    print(data.body);
+
     if (data.body == "notFound") {
       chatState = 'New';
     } else {
       chatState = 'Existing';
-      print(data.body);
       Map ddData = jsonDecode(data.body);
       chatid = ddData['_id'];
       ChatMessages = ddData['messages'];
@@ -44,8 +49,9 @@ class _newMessageStartState extends State<newMessageStart> {
   }
 
   void UpdateMessagesWithId(id) async {
+    print("update message with id");
     Response res = await post(
-        Uri.parse('http://192.168.1.69:5000/getMessageFormid'),
+        Uri.parse('http://192.168.1.69:80/getMessageFormid'),
         headers: {"jwt": widget.Token},
         body: jsonEncode({"id": id}));
     print(res.body);
@@ -58,12 +64,13 @@ class _newMessageStartState extends State<newMessageStart> {
   }
 
   void StartMessaging(Map message) async {
+    print("start messaging");
     Response res = await post(
-        Uri.parse('http://192.168.1.69:5000/StartMessagingWithNewContact'),
+        Uri.parse('http://192.168.1.69:80/StartMessagingWithNewContact'),
         headers: {"jwt": widget.Token},
         body: jsonEncode(message));
     print(res.body);
-
+    widget.updatehome();
     UpdateMessagesWithId(res.body);
   }
 
@@ -72,7 +79,7 @@ class _newMessageStartState extends State<newMessageStart> {
       required String textmessage,
       required bool isMedia}) async {
     Response res =
-        await post(Uri.parse('http://192.168.1.69:5000/postMessageToId'),
+        await post(Uri.parse('http://192.168.1.69:80/postMessageToId'),
             headers: {"jwt": widget.Token},
             body: jsonEncode({
               "id": id,
@@ -92,11 +99,11 @@ class _newMessageStartState extends State<newMessageStart> {
             title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
           CircleAvatar(
             foregroundImage: NetworkImage(
-                "http://192.168.1.69:5000/contact/get/jwt=${widget.Token}&pno=${widget.data['phonenumber']}"),
+                "http://192.168.1.69:80/contact/get/jwt=${widget.Token}&pno=${widget.data['phonenumber']}"),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(widget.data['name']),
+            child: Text(widget.data['name'] ?? "NPC"),
           ),
         ])),
         body: chatState == null

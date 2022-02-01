@@ -1,20 +1,23 @@
 import 'dart:async';
 
 import 'package:baata/Screens/home/contact_screen.dart';
+import 'package:baata/Screens/home/update_profile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class CustomDrawer extends StatefulWidget {
   User user;
   final ThemeMode ct;
-
+  final Function updatehome;
   final Function ThemeSetter;
-  CustomDrawer(
-      {Key? key,
-      required this.user,
-      required this.ThemeSetter,
-      required this.ct})
-      : super(key: key);
+
+  CustomDrawer({
+    Key? key,
+    required this.user,
+    required this.ThemeSetter,
+    required this.ct,
+    required this.updatehome,
+  }) : super(key: key);
 
   @override
   _CustomDrawerState createState() => _CustomDrawerState();
@@ -60,7 +63,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         radius: 40,
                         foregroundImage: JWTToken != ''
                             ? NetworkImage(
-                                "http://192.168.1.69:5000/contact/get/jwt=$JWTToken&pno=${widget.user.phoneNumber}")
+                                "http://192.168.1.69:80/contact/get/jwt=$JWTToken&pno=${widget.user.phoneNumber}")
                             : null,
                       ),
                       InkWell(
@@ -98,10 +101,22 @@ class _CustomDrawerState extends State<CustomDrawer> {
             )),
         ListTile(
           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (c) {
-            return ContactSelector();
-          })),
+            return ContactSelector(
+              updatehome: widget.updatehome,
+            );
+          })).then((value) => widget.updatehome()),
           leading: Icon(Icons.contacts_rounded),
           title: Text("Contacts"),
+        ),
+        ListTile(
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (c) {
+            return updateName(
+              Token: JWTToken,
+              uid: widget.user.uid,
+            );
+          })),
+          leading: Icon(Icons.person),
+          title: Text("Profile"),
         ),
         ElevatedButton(
             onPressed: () => FirebaseAuth.instance.signOut(),
