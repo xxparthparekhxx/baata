@@ -6,12 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
 class contactTile extends StatefulWidget {
-  String Token;
-  String PhoneNumber;
-  String DisplayName;
-  String uid;
-  Function updatehome;
-  contactTile(
+  final String Token;
+  final String PhoneNumber;
+  final String DisplayName;
+  final String uid;
+  final Function updatehome;
+  const contactTile(
       {Key? key,
       required this.DisplayName,
       required this.PhoneNumber,
@@ -31,10 +31,10 @@ class _contactTileState extends State<contactTile> {
 
   void getStatus() async {
     Response res = await get(Uri.parse(
-        "http://192.168.1.69:80/status/get/jwt=${widget.Token}&uid=${widget.PhoneNumber}"));
+        "http://52.66.199.213:5000/status/get/jwt=${widget.Token}&uid=${widget.PhoneNumber}"));
 
-    print(res.body);
-    print("THIS IS RES DATA" + res.body);
+    // print(res.body);
+    // print("THIS IS RES DATA" + res.body);
     if (res.body != "Not Found" && mounted) {
       resData = jsonDecode(res.body);
       status = resData!['status'];
@@ -50,6 +50,8 @@ class _contactTileState extends State<contactTile> {
     super.initState();
   }
 
+  void inviteFunction() {}
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -57,7 +59,6 @@ class _contactTileState extends State<contactTile> {
         if (status != null &&
             resData["name"] != null &&
             resData['uid'] != FirebaseAuth.instance.currentUser!.uid) {
-          print(resData);
           Navigator.push(context, MaterialPageRoute(builder: (c) {
             return newMessageStart(
               Token: widget.Token,
@@ -70,8 +71,8 @@ class _contactTileState extends State<contactTile> {
       leading: CircleAvatar(
         radius: 40,
         foregroundImage: NetworkImage(
-            "http://192.168.1.69:80/contact/get/jwt=${widget.Token}&pno=${widget.PhoneNumber}"),
-        onForegroundImageError: (o, e) => print('notFound'),
+            "http://52.66.199.213:5000/contact/get/jwt=${widget.Token}&pno=${widget.PhoneNumber}"),
+        onForegroundImageError: (o, e) => {},
         backgroundColor: Colors.black,
         child: Text(widget.DisplayName.substring(0, 2)),
       ),
@@ -79,7 +80,7 @@ class _contactTileState extends State<contactTile> {
       subtitle: Text(status == null ? widget.PhoneNumber : status!),
       trailing: isUser
           ? null
-          : ElevatedButton(onPressed: () {}, child: Text("Invite")),
+          : ElevatedButton(onPressed: inviteFunction, child: Text("Invite")),
     );
   }
 }

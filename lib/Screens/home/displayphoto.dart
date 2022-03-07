@@ -33,9 +33,12 @@ class _displayphotoState extends State<displayphoto> {
   }
 
   void sendImagetoid({required String id, required File Image}) async {
+    setState(() {
+      uploading = true;
+    });
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse("http://192.168.1.69:80/PostImageToId"),
+      Uri.parse("http://52.66.199.213:5000/PostImageToId"),
     );
     Map<String, String> headers = {
       "Content-type": "multipart/form-data",
@@ -58,7 +61,9 @@ class _displayphotoState extends State<displayphoto> {
     request.headers.addAll(headers);
     var res = await request.send();
     http.Response response = await http.Response.fromStream(res);
+    print(response.statusCode);
     if(response.statusCode == 200){
+      
       Navigator.pop(context);
       Navigator.pop(context);
     }
@@ -102,6 +107,7 @@ class _displayphotoState extends State<displayphoto> {
     }
 
   }
+  bool uploading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,8 +141,8 @@ class _displayphotoState extends State<displayphoto> {
                         onTap: () {
                           _cropImage();
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
+                        child: const Padding(
+                          padding: EdgeInsets.all(10.0),
                           child: Icon(
                             Icons.crop,
                             size: 50,
@@ -146,7 +152,7 @@ class _displayphotoState extends State<displayphoto> {
                 ),
               ),
               Container(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -158,13 +164,13 @@ class _displayphotoState extends State<displayphoto> {
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: Row(
                             children: [
-                              SizedBox(width: 10),
+                              const SizedBox(width: 10),
                               TextField(
-                                style: TextStyle(color: Colors.black),
+                                style: const TextStyle(color: Colors.black),
                                 controller: Message,
                                 decoration: InputDecoration(
                                     hintText: "Message",
-                                    hintStyle: TextStyle(color: Colors.black12),
+                                    hintStyle: const TextStyle(color: Colors.black12),
                                     border: InputBorder.none,
                                     constraints: BoxConstraints(
                                       maxWidth:
@@ -176,7 +182,7 @@ class _displayphotoState extends State<displayphoto> {
                           ),
                         ),
                       ),
-                      Padding(
+                     !uploading? Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4.0),
                         child: Container(
                           decoration: BoxDecoration(
@@ -198,6 +204,10 @@ class _displayphotoState extends State<displayphoto> {
                             ),
                           ),
                         ),
+                      ):
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child:  CircularProgressIndicator(backgroundColor: Colors.black,),
                       )
                     ],
                   )),

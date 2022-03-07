@@ -1,11 +1,9 @@
 import 'package:baata/Screens/home/contact_screen.dart';
-import 'package:baata/Screens/home/messagePage.dart';
 import 'package:baata/Screens/home/user_home.dart';
 import 'package:baata/Screens/profile/newuserprofiledetails.dart';
 import 'package:baata/Settings/manager.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
 
 class loggedinPage extends StatefulWidget {
   final User profile;

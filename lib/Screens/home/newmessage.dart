@@ -27,7 +27,7 @@ class _newMessageStartState extends State<newMessageStart> {
     print('getMessages');
     var data = await get(
         Uri.parse(
-            'http://192.168.1.69:80/GetChatFromUid/uid=${widget.data['uid']}'),
+            'http://52.66.199.213:5000/GetChatFromUid/uid=${widget.data['uid']}'),
         headers: {"jwt": widget.Token});
     print(data.body);
 
@@ -51,7 +51,7 @@ class _newMessageStartState extends State<newMessageStart> {
   void UpdateMessagesWithId(id) async {
     print("update message with id");
     Response res = await post(
-        Uri.parse('http://192.168.1.69:80/getMessageFormid'),
+        Uri.parse('http://52.66.199.213:5000/getMessageFormid'),
         headers: {"jwt": widget.Token},
         body: jsonEncode({"id": id}));
     print(res.body);
@@ -66,7 +66,7 @@ class _newMessageStartState extends State<newMessageStart> {
   void StartMessaging(Map message) async {
     print("start messaging");
     Response res = await post(
-        Uri.parse('http://192.168.1.69:80/StartMessagingWithNewContact'),
+        Uri.parse('http://52.66.199.213:5000/StartMessagingWithNewContact'),
         headers: {"jwt": widget.Token},
         body: jsonEncode(message));
     print(res.body);
@@ -79,7 +79,7 @@ class _newMessageStartState extends State<newMessageStart> {
       required String textmessage,
       required bool isMedia}) async {
     Response res =
-        await post(Uri.parse('http://192.168.1.69:80/postMessageToId'),
+        await post(Uri.parse('http://52.66.199.213:5000/postMessageToId'),
             headers: {"jwt": widget.Token},
             body: jsonEncode({
               "id": id,
@@ -99,7 +99,7 @@ class _newMessageStartState extends State<newMessageStart> {
             title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
           CircleAvatar(
             foregroundImage: NetworkImage(
-                "http://192.168.1.69:80/contact/get/jwt=${widget.Token}&pno=${widget.data['phonenumber']}"),
+                "http://52.66.199.213:5000/contact/get/jwt=${widget.Token}&pno=${widget.data['phonenumber']}"),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -107,7 +107,7 @@ class _newMessageStartState extends State<newMessageStart> {
           ),
         ])),
         body: chatState == null
-            ? CircularProgressIndicator()
+            ? const CircularProgressIndicator()
             : Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -136,8 +136,8 @@ class _newMessageStartState extends State<newMessageStart> {
                                           ChatMessages![index]['MessageText'] ??
                                               ChatMessages![index]
                                                   ["messageText"],
-                                          style:
-                                              TextStyle(color: Colors.black)),
+                                          style: const TextStyle(
+                                              color: Colors.black)),
                                     ),
                                   )
                                 ],
@@ -145,9 +145,8 @@ class _newMessageStartState extends State<newMessageStart> {
                             },
                           ),
                         )
-                      : Center(child: Text("Start  Messaging")),
-                  Container(
-                      child: Row(
+                      : const Center(child: Text("Start  Messaging")),
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       TextField(
@@ -176,10 +175,10 @@ class _newMessageStartState extends State<newMessageStart> {
                             //todo implement sendind data
                             // text will have sender_uid,Text,time, and it will retrive the new chat id and messages then ss
                           },
-                          child: Icon(Icons.send))
+                          child: const Icon(Icons.send))
                     ],
-                  )),
-                  SizedBox(
+                  ),
+                  const SizedBox(
                     height: 10,
                   )
                 ],

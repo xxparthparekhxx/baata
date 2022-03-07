@@ -60,12 +60,12 @@ class _VideoAppState extends State<VideoApp> {
                     if (_controller.value.isBuffering)
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                        children: const [
                           CircularProgressIndicator(),
                         ],
                       ),
                     Column(children: [
-                      Container(
+                      SizedBox(
                         height: ss.height * 0.9,
                         child: Column(
                             mainAxisSize: MainAxisSize.max,
@@ -155,7 +155,7 @@ class _VideoAppState extends State<VideoApp> {
                     ])
                   ])
                 ])
-              : Center(child: CircularProgressIndicator())),
+              : const Center(child: CircularProgressIndicator())),
     );
   }
 

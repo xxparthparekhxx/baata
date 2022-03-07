@@ -82,8 +82,7 @@ class _EnterOtpState extends State<EnterOtp> {
                   ],
                 ),
               ),
-              Container(
-                  child: Column(
+              Column(
                 children: [
                   ThreeNumberRowTiles("1", "2", "3"),
                   ThreeNumberRowTiles("4", "5", "6"),
@@ -145,7 +144,7 @@ class _EnterOtpState extends State<EnterOtp> {
                     ],
                   ),
                 ],
-              ))
+              )
             ],
           )
         ],

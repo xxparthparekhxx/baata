@@ -46,10 +46,31 @@ class _ContactSelectorState extends State<ContactSelector> {
         appBar: AppBar(
           // title: const Text("Send Your First Message"),
           actions: [
-            Container(
-              width: 300,
-              child: TextField(
-                controller: SearchController,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30)),
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.search,
+                      color: Colors.orange,
+                    ),
+                    Expanded(
+                      child: TextField(
+                        style: TextStyle(color: Colors.black),
+                        decoration: InputDecoration(
+                            hintStyle: TextStyle(color: Colors.black54),
+                            hintText: "  Search Your Contacts"),
+                        controller: SearchController,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             )
           ],
@@ -61,16 +82,14 @@ class _ContactSelectorState extends State<ContactSelector> {
                   ContactList![index]
                       .displayName
                       .toLowerCase()
-                      .contains(SearchController.text.toLowerCase())) {
+                      .startsWith(SearchController.text.toLowerCase())) {
                 String Phonenumber = ContactList![index]
                     .phones
                     .elementAt(0)
                     .number
                     .replaceAll(" ", "");
                 if (!Phonenumber.startsWith("+91")) {
-                  print(Phonenumber);
                   Phonenumber = "+91" + Phonenumber;
-                  print(Phonenumber);
                 }
                 Contact cc = ContactList![index];
                 return contactTile(
@@ -88,12 +107,12 @@ class _ContactSelectorState extends State<ContactSelector> {
     } else {
       return Scaffold(
         appBar: AppBar(
-          title: Text("Start Messaging"),
+          title: const Text("Start Messaging"),
         ),
-        body: Column(children: [
+        body: Column(children: const [
           LinearProgressIndicator(),
           Center(
-            child: Text("Loading Your Contacts"),
+            child: Text("Fetching Your Contacts"),
           )
         ]),
       );

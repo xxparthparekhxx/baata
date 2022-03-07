@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:baata/Screens/home/videoinChat.dart';
 import 'package:http/http.dart' as http;
 import 'package:baata/Screens/home/networimage.dart';
-
 import 'package:baata/Screens/home/viewimage.dart';
 import 'package:baata/Screens/home/displayphoto.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -51,19 +50,20 @@ class _MessagePageState extends State<MessagePage> {
 
   void UpdateMessagesWithId(id) async {
     Response res = await post(
-        Uri.parse('http://192.168.1.69:80/getMessageFormid'),
+        Uri.parse('http://52.66.199.213:5000/getMessageFormid'),
         headers: {"jwt": widget.Token},
         body: jsonEncode({"id": id}));
 
     ChatMessages = jsonDecode(res.body);
     chatState = "E";
+    print(ChatMessages);
     setState(() {});
     jupmtobottom();
   }
 
   void StartMessaging(Map message) async {
     Response res = await post(
-        Uri.parse('http://192.168.1.69:80/StartMessagingWithNewContact'),
+        Uri.parse('http://52.66.199.213:5000/StartMessagingWithNewContact'),
         headers: {"jwt": widget.Token},
         body: jsonEncode(message));
 
@@ -75,7 +75,7 @@ class _MessagePageState extends State<MessagePage> {
       required String textmessage,
       required bool isMedia}) async {
     Response res =
-        await post(Uri.parse('http://192.168.1.69:80/postMessageToId'),
+        await post(Uri.parse('http://52.66.199.213:5000/postMessageToId'),
             headers: {"jwt": widget.Token},
             body: jsonEncode({
               "id": id,
@@ -111,7 +111,7 @@ class _MessagePageState extends State<MessagePage> {
 
     final http.MultipartRequest request = http.MultipartRequest(
       'POST',
-      Uri.parse("http://192.168.1.69:80/PostVideoToId"),
+      Uri.parse("http://52.66.199.213:5000/PostVideoToId"),
     );
     final Map<String, String> headers = {
       "Content-type": "multipart/form-data",
@@ -155,7 +155,10 @@ class _MessagePageState extends State<MessagePage> {
                   XFile? file = await ImagePicker().pickVideo(
                       source: ImageSource.camera,
                       maxDuration: const Duration(hours: 3));
-                  if (file != null) {}
+                  if (file != null) {
+                    sendVideotoid(id: widget.messageId, Path: file.path);
+                  }
+                  Navigator.pop(context);
                 },
                 leading: const Icon(Icons.video_collection),
                 title: const Text("Video"),
@@ -241,7 +244,42 @@ class _MessagePageState extends State<MessagePage> {
           Token: widget.Token,
           Tag: index.toString(),
           url:
-              "http://192.168.1.69:80/messageimage/id=${widget.messageId}&i=$index");
+              "http://52.66.199.213:5000/messageimage/id=${widget.messageId}&i=$index");
+    }));
+  }
+
+  void Displayprofile() {
+    Navigator.push(context, MaterialPageRoute(builder: (c) {
+      return Scaffold(
+        body:
+            Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Hero(
+                  tag: "ProfilePhoto",
+                  child: CircleAvatar(
+                    radius: MediaQuery.of(context).size.height * 0.1,
+                    foregroundImage: NetworkImage(
+                        "http://52.66.199.213:5000/profile/get/jwt=${widget.Token}&uid=${widget.Senderuid}"),
+                  )),
+              Text(widget.SenderName),
+              ListView.builder(itemBuilder: ((context, index) {
+                return ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: 100, maxWidth: 100),
+                    child: Hero(
+                      tag: "photo" + index.toString(),
+                      child: NetworkImg(
+                        Token: widget.Token,
+                        url:
+                            "http://52.66.199.213:5000/messageimage/id=${widget.messageId}&i=$index",
+                      ),
+                    ));
+              })),
+            ],
+          )
+        ]),
+      );
     }));
   }
 
@@ -255,24 +293,28 @@ class _MessagePageState extends State<MessagePage> {
   @override
   Widget build(BuildContext context) {
     listener;
-
     double query = MediaQuery.of(context).viewInsets.bottom;
     if (query != 0) {
       MIController.jumpTo(MIController.position.maxScrollExtent);
     }
-// "MediaType" Image
     return Scaffold(
         appBar: AppBar(
-            title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-          CircleAvatar(
-            foregroundImage: NetworkImage(
-                "http://192.168.1.69:80/profile/get/jwt=${widget.Token}&uid=${widget.Senderuid}"),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(widget.SenderName),
-          ),
-        ])),
+            title: InkWell(
+          onTap: () => Displayprofile(),
+          child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+            Hero(
+              tag: "ProfilePhoto",
+              child: CircleAvatar(
+                foregroundImage: NetworkImage(
+                    "http://52.66.199.213:5000/profile/get/jwt=${widget.Token}&uid=${widget.Senderuid}"),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Text(widget.SenderName),
+            ),
+          ]),
+        )),
         body: chatState == null
             ? const CircularProgressIndicator()
             : Column(
@@ -323,7 +365,7 @@ class _MessagePageState extends State<MessagePage> {
                                                           child: NetworkImg(
                                                             Token: widget.Token,
                                                             url:
-                                                                "http://192.168.1.69:80/messageimage/id=${widget.messageId}&i=$index",
+                                                                "http://52.66.199.213:5000/messageimage/id=${widget.messageId}&i=$index",
                                                           ),
                                                         )),
                                                   ),
@@ -355,6 +397,12 @@ class _MessagePageState extends State<MessagePage> {
                                                           widget.messageId,
                                                     )
                                           : Container(
+                                              constraints: BoxConstraints(
+                                                  maxWidth:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.8),
                                               decoration: messagebubble(index),
                                               child: Padding(
                                                 padding:
@@ -365,8 +413,10 @@ class _MessagePageState extends State<MessagePage> {
                                                       ChatMessages![index]
                                                           ["messageText"],
                                                   style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 20),
+                                                    color: Colors.black,
+                                                    fontSize: 20,
+                                                  ),
+                                                  softWrap: true,
                                                 ),
                                               ),
                                             ))

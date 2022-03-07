@@ -11,16 +11,17 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 class UserHome extends StatefulWidget {
-  User user;
+  final User user;
   final Function ThemeSetter;
   final ThemeMode ct;
-
-  UserHome(
-      {Key? key,
-      required this.user,
-      required this.ThemeSetter,
-      required this.ct})
-      : super(key: key);
+  final bool? updateHome;
+  const UserHome({
+    Key? key,
+    required this.user,
+    required this.ThemeSetter,
+    required this.ct,
+    this.updateHome,
+  }) : super(key: key);
 
   @override
   _UserHomeState createState() => _UserHomeState();
@@ -33,36 +34,48 @@ class _UserHomeState extends State<UserHome> {
   String? token;
   String? newinitialId;
   void FetchuserMessages() async {
-    token = await widget.user.getIdToken();
-    http.Response res = await http.get(Uri.parse(
-        "http://192.168.1.69:80/profile/getMessage/metadata/jwt=$token"));
-    MessageList = jsonDecode(res.body);
-    setState(() {});
+    bool updateDone = false;
+
+    while (!updateDone) {
+      try {
+        token = await widget.user.getIdToken();
+        http.Response res = await http.get(Uri.parse(
+            "http://52.66.199.213:5000/profile/getMessage/metadata/jwt=$token"));
+        MessageList = jsonDecode(res.body);
+        setState(() {});
+        if (res.statusCode == 200) {
+          updateDone = true;
+        } else {
+          Future.delayed(const Duration(seconds: 1));
+        }
+      } catch (e) {
+        print(e);
+        Future.delayed(const Duration(seconds: 1));
+      }
+    }
   }
 
   void getToken() async {
     token = await widget.user.getIdToken();
     setState(() {});
-    Timer.periodic(Duration(hours: 1), (timer) async {
+    Timer.periodic(const Duration(minutes: 10), (timer) async {
       token = await widget.user.getIdToken();
       setState(() {});
     });
   }
 
   void updateMessagingToken() async {
-    String messagingtoken = await messaging.getToken() ?? "";
-    http.Response res = await http.post(
-        Uri.parse("http://192.168.1.69:80/profile/SetFmcToken"),
+    final String messagingtoken = await messaging.getToken() ?? "";
+    final http.Response res = await http.post(
+        Uri.parse("http://52.66.199.213:5000/profile/SetFmcToken"),
         body: jsonEncode({"Fmc": messagingtoken}),
         headers: {"jwt": token!});
-    print(messagingtoken);
   }
 
   @override
   void initState() {
     getToken();
     updateMessagingToken();
-    // TODO: implement initState
     FetchuserMessages();
     super.initState();
   }
@@ -82,31 +95,32 @@ class _UserHomeState extends State<UserHome> {
       )),
       appBar: AppBar(
         actions: const [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 10.0),
-            child: Icon(Icons.search_sharp),
-          ),
+          // Padding(
+          //   padding: EdgeInsets.symmetric(horizontal: 10.0),
+          //   child: Icon(Icons.search_sharp),
+          // ),
         ],
       ),
       body: MessageList == null
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.symmetric(vertical: 10.0),
               child: ListView.builder(
                 itemCount: MessageList!.length,
                 itemBuilder: (context, index) {
-                  String sender = MessageList![index]['u1'] == widget.user.uid
-                      ? MessageList![index]['u2']
-                      : MessageList![index]['u1'];
-                  String senderName =
+                  final String sender =
+                      MessageList![index]['u1'] == widget.user.uid
+                          ? MessageList![index]['u2']
+                          : MessageList![index]['u1'];
+                  final String senderName =
                       MessageList![index]['u1'] == widget.user.uid
                           ? MessageList![index]['n2']
                           : MessageList![index]['n1'];
-                  String UserNumber =
+                  final String UserNumber =
                       MessageList![index]['u1'] == widget.user.uid ? "1" : "2";
-                  DateTime DT = DateTime.parse(
-                      MessageList![index]['lastMessageTime'].toString());
-                  String Time = DateFormat("h:mma").format(DT);
+                  final DateTime DT = DateTime.fromMillisecondsSinceEpoch(
+                      MessageList![index]['lastMessageTime']);
+                  final String Time = DateFormat("h:mma").format(DT);
                   return Padding(
                     padding: const EdgeInsets.all(10),
                     child: InkWell(
@@ -130,7 +144,7 @@ class _UserHomeState extends State<UserHome> {
                                   radius: 30,
                                   backgroundColor: Colors.black,
                                   foregroundImage: NetworkImage(
-                                      "http://192.168.1.69:80/profile/get/jwt=$token&uid=$sender",
+                                      "http://52.66.199.213:5000/profile/get/jwt=$token&uid=$sender",
                                       headers: {"Keep-Alive": "timeout=10"}),
                                 ),
                                 Padding(
@@ -138,7 +152,7 @@ class _UserHomeState extends State<UserHome> {
                                       horizontal: 20),
                                   child: Text(
                                     senderName,
-                                    style: TextStyle(fontSize: 15),
+                                    style: const TextStyle(fontSize: 15),
                                   ),
                                 ),
                               ],

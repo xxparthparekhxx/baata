@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:baata/Screens/AuthScreens/countryselect.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'AuthWidgets/countrycodeslist.dart' as c;
@@ -20,23 +23,10 @@ class _enterPhoneNumberScreeneState extends State<enterPhoneNumberScreene> {
   Map<String, String>? countrySelected;
   String phonenumber = '';
   void promptToSelectCountry(BuildContext context) {
-    showDialog(
+    showBottomSheet(
         context: context,
         builder: (ctx) {
-          var ss = MediaQuery.of(context).size;
-          return AlertDialog(
-            content: Container(
-              width: ss.width,
-              height: ss.height * 0.6,
-              child: ListView.builder(
-                itemBuilder: (ctx, idx) {
-                  Map<String, String> Data = c.COUNTRY_EXTENSIONS[idx];
-                  return CountryListTile(Data, ss, true);
-                },
-                itemCount: c.COUNTRY_EXTENSIONS.length,
-              ),
-            ),
-          );
+          return CountrySelect(CountryListTile: CountryListTile);
         });
   }
 
@@ -61,10 +51,7 @@ class _enterPhoneNumberScreeneState extends State<enterPhoneNumberScreene> {
           children: [
             Container(
               width: ss.width * 0.1,
-              child: Image.network(
-                "https://storage.googleapis.com/freeflags/flags/${Data["isoCode"]!}.jpg",
-                fit: BoxFit.cover,
-              ),
+              child: Image.asset("flags/${Data["isoCode"]!}.jpg"),
             ),
             Text(Data['dialCode'] as String,
                 style: TextStyle(
@@ -87,8 +74,10 @@ class _enterPhoneNumberScreeneState extends State<enterPhoneNumberScreene> {
       },
       child: Container(
         padding: EdgeInsets.symmetric(
-            horizontal: MediaQuery.of(context).size.width * 0.08,
-            vertical: MediaQuery.of(context).size.width * 0.06),
+            horizontal: MediaQuery.of(context).size.width * 0.08 -
+                MediaQuery.of(context).viewInsets.bottom,
+            vertical: MediaQuery.of(context).size.width * 0.06 -
+                MediaQuery.of(context).viewInsets.bottom * 10),
         decoration: const BoxDecoration(shape: BoxShape.circle),
         child: Text(
           text,
@@ -109,10 +98,12 @@ class _enterPhoneNumberScreeneState extends State<enterPhoneNumberScreene> {
   @override
   Widget build(BuildContext context) {
     var ss = MediaQuery.of(context).size;
-    return SafeArea(
-      child: Container(
+    return OverflowBox(
+      maxHeight: ss.height,
+      maxWidth: ss.width,
+      child: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -124,14 +115,16 @@ class _enterPhoneNumberScreeneState extends State<enterPhoneNumberScreene> {
                     children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                        children: const [
                           Text(
                             "Enter Your",
-                            style: Theme.of(context).primaryTextTheme.headline1,
+                            style: TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.bold),
                           ),
                           Text(
                             "mobile number",
-                            style: Theme.of(context).primaryTextTheme.headline1,
+                            style: TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -142,8 +135,8 @@ class _enterPhoneNumberScreeneState extends State<enterPhoneNumberScreene> {
                   padding: const EdgeInsets.all(10.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Text("We will send you a confirmation code"),
+                    children: const [
+                      Text("We will send you a confirmation code"),
                     ],
                   ),
                 ),
@@ -178,8 +171,7 @@ class _enterPhoneNumberScreeneState extends State<enterPhoneNumberScreene> {
                     ],
                   ),
                 ),
-                Container(
-                    child: Column(
+                Column(
                   children: [
                     ThreeNumberRowTiles("1", "2", "3"),
                     ThreeNumberRowTiles("4", "5", "6"),
@@ -202,10 +194,16 @@ class _enterPhoneNumberScreeneState extends State<enterPhoneNumberScreene> {
                             borderRadius: BorderRadius.circular(180),
                             child: Container(
                               padding: EdgeInsets.symmetric(
-                                  horizontal:
-                                      MediaQuery.of(context).size.width * 0.05,
-                                  vertical:
-                                      MediaQuery.of(context).size.width * 0.04),
+                                  horizontal: (MediaQuery.of(context)
+                                              .size
+                                              .width *
+                                          0.05) -
+                                      MediaQuery.of(context).viewInsets.bottom *
+                                          10,
+                                  vertical: (MediaQuery.of(context).size.width *
+                                          0.04) -
+                                      MediaQuery.of(context).viewInsets.bottom *
+                                          10),
                               decoration:
                                   const BoxDecoration(shape: BoxShape.circle),
                               child: const Icon(
@@ -230,10 +228,16 @@ class _enterPhoneNumberScreeneState extends State<enterPhoneNumberScreene> {
                           borderRadius: BorderRadius.circular(180),
                           child: Container(
                               padding: EdgeInsets.symmetric(
-                                  horizontal:
-                                      MediaQuery.of(context).size.width * 0.050,
-                                  vertical: MediaQuery.of(context).size.width *
-                                      0.050),
+                                  horizontal: (MediaQuery.of(context)
+                                              .size
+                                              .width *
+                                          0.050) -
+                                      MediaQuery.of(context).viewInsets.bottom *
+                                          10,
+                                  vertical: (MediaQuery.of(context).size.width *
+                                          0.050) -
+                                      MediaQuery.of(context).viewInsets.bottom *
+                                          10),
                               decoration:
                                   const BoxDecoration(shape: BoxShape.circle),
                               child: !Verificationstarted
@@ -257,7 +261,7 @@ class _enterPhoneNumberScreeneState extends State<enterPhoneNumberScreene> {
                       ],
                     ),
                   ],
-                ))
+                )
               ],
             )
           ],

@@ -42,7 +42,7 @@ class _PfpState extends State<Pfp> {
 
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse("http://192.168.1.69:80/profile/upload"),
+      Uri.parse("http://52.66.199.213:5000/profile/upload"),
     );
     Map<String, String> headers = {"Content-type": "multipart/form-data","jwt":await widget.profile.getIdToken()};
     request.files.add(
@@ -72,7 +72,7 @@ class _PfpState extends State<Pfp> {
       setState(() {    
       imageFile = null;
       });
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: const Text("You are Retarded")));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: const Text("You are Need To upload a Photo")));
     }, child: pic? 
           Text(text): Padding(padding: const EdgeInsets.symmetric(horizontal:20),
     child: Text(text),),

@@ -2,7 +2,6 @@ import 'package:baata/Screens/home/logedin_page_root.dart';
 import 'package:baata/Screens/AuthScreens/signinpage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Settings/manager.dart';
 
@@ -19,7 +18,7 @@ class MainAppState extends State<MainApp> {
   void getSavedThemeMode() async {
     prefs = await SharedPreferences.getInstance();
     String? userTheme = prefs!.getString("CurrentTheme");
-    print(userTheme);
+
     if (userTheme == null) {
       CurrentTheme = ThemeMode.system;
     } else if (userTheme == "l") {
@@ -47,7 +46,7 @@ class MainAppState extends State<MainApp> {
     if (mode == ThemeMode.dark) {
       theme = 'd';
     }
-    print(theme);
+
     print(await prefs!.setString("CurrentTheme", theme));
   }
 
@@ -77,7 +76,7 @@ class MainAppState extends State<MainApp> {
             /* dark theme settings */
             appBarTheme: const AppBarTheme(
                 color: Colors.orange,
-                titleTextStyle: const TextStyle(
+                titleTextStyle: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.bold,
                     fontSize: 24))),

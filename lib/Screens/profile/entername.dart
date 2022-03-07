@@ -12,6 +12,11 @@ class NameCollector extends StatelessWidget {
       children: [
         const Text("Enter Your Display Name"),
         TextField(
+          decoration: InputDecoration(
+              labelText: "Enter Your Name",
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(40)),
+              hintText: "   Enter Your Name"),
           controller: controller,
         ),
         ElevatedButton(
@@ -19,7 +24,7 @@ class NameCollector extends StatelessWidget {
               NameSetter(controller.text);
               FocusScope.of(context).unfocus();
             },
-            child: Text("Use this Name ?"))
+            child: const Text("Use this Name ?"))
       ],
     );
   }

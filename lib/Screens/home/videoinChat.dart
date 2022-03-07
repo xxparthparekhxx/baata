@@ -41,20 +41,20 @@ class _VideoInChatState extends State<VideoInChat> {
     return Container(
         width: 200,
         height: 200,
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         decoration: widget.decoration,
         child: GestureDetector(
             onTap: () => displayvideo(
-                "http://192.168.1.69:80/messageVideo/id=${widget.messageId}&i=${widget.index}"),
+                "http://52.66.199.213:5000/messageVideo/id=${widget.messageId}&i=${widget.index}"),
             child: Container(
                 color: Colors.black,
                 child: Stack(alignment: AlignmentDirectional.center, children: [
                   CachedNetworkImage(
                     imageUrl:
-                        "http://192.168.1.69:80/getVidThumb/id=${widget.messageId}idx=${widget.index}",
+                        "http://52.66.199.213:5000/getVidThumb/id=${widget.messageId}idx=${widget.index}",
                     httpHeaders: {"jwt": widget.Token},
                   ),
-                  Icon(Icons.play_arrow_sharp)
+                  const Icon(Icons.play_arrow_sharp)
                 ]))));
   }
 }
