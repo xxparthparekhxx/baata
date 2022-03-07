@@ -7,4 +7,3 @@ MongoDb
 nginx 
 flask
 open cv
-
