@@ -33,7 +33,7 @@ class _contactTileState extends State<contactTile> {
 
   void getStatus() async {
     Response res = await get(Uri.parse(
-        "http://52.66.199.213:5000/status/get/jwt=${widget.Token}&uid=${widget.PhoneNumber}"));
+        "$URL/status/get/jwt=${widget.Token}&uid=${widget.PhoneNumber}"));
 
     // print(res.body);
     // print("THIS IS RES DATA" + res.body);
@@ -53,9 +53,8 @@ class _contactTileState extends State<contactTile> {
   }
 
   void inviteFunction() => Share.share(
-      'check out my website https://example.com',
-      subject:
-          "Lets Chat on Baata It's a Fast Simple And Secure Chat App we can use to message each other for free. Get it at https://baata.ml");
+        "Lets Chat on Baata It's a Fast Simple And Secure Chat App we can use to message each other for free. Get it at https://baata.ml",
+      );
 
   @override
   Widget build(BuildContext context) {
