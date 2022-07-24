@@ -47,7 +47,7 @@ class MainAppState extends State<MainApp> {
       theme = 'd';
     }
 
-    print(await prefs!.setString("CurrentTheme", theme));
+    await prefs!.setString("CurrentTheme", theme);
   }
 
   @override

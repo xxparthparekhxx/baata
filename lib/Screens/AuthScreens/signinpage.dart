@@ -2,9 +2,7 @@ import 'package:baata/Screens/AuthScreens/enter_otp.dart';
 import 'package:baata/Screens/AuthScreens/phone_number_screen.dart';
 import 'package:baata/Screens/AuthScreens/welcome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
-import 'AuthWidgets/countrycodeslist.dart' as c;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

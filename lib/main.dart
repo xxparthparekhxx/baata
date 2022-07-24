@@ -1,3 +1,4 @@
+import 'package:baata/firebase_options.dart';
 import 'package:flutter/material.dart';
 // Import the firebase_core plugin
 import 'root.dart';
@@ -8,10 +9,12 @@ import 'package:firebase_core/firebase_core.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(App());
+  runApp(const App());
 }
 
 class App extends StatefulWidget {
+  const App({Key? key}) : super(key: key);
+
   @override
   _AppState createState() => _AppState();
 }
@@ -25,7 +28,8 @@ class _AppState extends State<App> {
   void initializeFlutterFire() async {
     try {
       // Wait for Firebase to initialize and set `_initialized` state to true
-      await Firebase.initializeApp();
+      await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform);
       setState(() {
         _initialized = true;
       });

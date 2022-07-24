@@ -1,14 +1,10 @@
-import 'dart:ui';
-
 import 'package:baata/Screens/AuthScreens/countryselect.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'AuthWidgets/countrycodeslist.dart' as c;
 
 class enterPhoneNumberScreene extends StatefulWidget {
-  Function startVerification;
-  String? Error;
-  enterPhoneNumberScreene({
+  final Function startVerification;
+  final String? Error;
+  const enterPhoneNumberScreene({
     this.Error,
     required this.startVerification,
     Key? key,
@@ -49,7 +45,7 @@ class _enterPhoneNumberScreeneState extends State<enterPhoneNumberScreene> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Container(
+            SizedBox(
               width: ss.width * 0.1,
               child: Image.asset("flags/${Data["isoCode"]!}.jpg"),
             ),
@@ -248,10 +244,10 @@ class _enterPhoneNumberScreeneState extends State<enterPhoneNumberScreene> {
                                           ? Colors.blueGrey
                                           : Colors.orange,
                                     )
-                                  : Container(
+                                  : const SizedBox(
                                       height: 40,
                                       width: 40,
-                                      child: const CircularProgressIndicator(
+                                      child: CircularProgressIndicator(
                                         backgroundColor: Colors.orange,
                                         color: Colors.black,
                                         semanticsLabel: "Loading",

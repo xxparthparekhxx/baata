@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:baata/Settings/models/appuser.dart';
+import 'package:baata/consts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 
@@ -26,7 +26,7 @@ class uManager {
   }
 
   Stream<UserStates> userDetails() async* {
-    const String Address = 'http://52.66.199.213:5000/';
+    const String Address = URL;
     String idtoken;
 
     idtoken = await person.getIdToken();
@@ -38,12 +38,9 @@ class uManager {
           url: Address + "profile/uudetails",
           idtoken: idtoken,
         );
-        print(res.body);
-        print(res.statusCode);
-        await Future.delayed(Duration(seconds: 1));
-      } catch (e) {
-        print(e);
-      }
+
+        await Future.delayed(const Duration(seconds: 1));
+      } catch (e) {}
     }
 
     var userdata = jsonDecode(res.body);

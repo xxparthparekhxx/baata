@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:baata/Screens/home/videoinChat.dart';
+import 'package:baata/consts.dart';
 import 'package:http/http.dart' as http;
 import 'package:baata/Screens/home/networimage.dart';
 import 'package:baata/Screens/home/viewimage.dart';
@@ -49,10 +50,8 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   void UpdateMessagesWithId(id) async {
-    Response res = await post(
-        Uri.parse('http://52.66.199.213:5000/getMessageFormid'),
-        headers: {"jwt": widget.Token},
-        body: jsonEncode({"id": id}));
+    Response res = await post(Uri.parse('${URL}getMessageFormid'),
+        headers: {"jwt": widget.Token}, body: jsonEncode({"id": id}));
 
     ChatMessages = jsonDecode(res.body);
     chatState = "E";
@@ -62,10 +61,8 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   void StartMessaging(Map message) async {
-    Response res = await post(
-        Uri.parse('http://52.66.199.213:5000/StartMessagingWithNewContact'),
-        headers: {"jwt": widget.Token},
-        body: jsonEncode(message));
+    Response res = await post(Uri.parse('${URL}StartMessagingWithNewContact'),
+        headers: {"jwt": widget.Token}, body: jsonEncode(message));
 
     UpdateMessagesWithId(res.body);
   }
@@ -74,16 +71,15 @@ class _MessagePageState extends State<MessagePage> {
       {required String id,
       required String textmessage,
       required bool isMedia}) async {
-    Response res =
-        await post(Uri.parse('http://52.66.199.213:5000/postMessageToId'),
-            headers: {"jwt": widget.Token},
-            body: jsonEncode({
-              "id": id,
-              "Sender": selfUid,
-              "messageTime": DateTime.now().millisecondsSinceEpoch,
-              "MessageText": textmessage,
-              "isMedia": isMedia
-            }));
+    Response res = await post(Uri.parse('${URL}postMessageToId'),
+        headers: {"jwt": widget.Token},
+        body: jsonEncode({
+          "id": id,
+          "Sender": selfUid,
+          "messageTime": DateTime.now().millisecondsSinceEpoch,
+          "MessageText": textmessage,
+          "isMedia": isMedia
+        }));
     UpdateMessagesWithId(id);
   }
 
@@ -111,7 +107,7 @@ class _MessagePageState extends State<MessagePage> {
 
     final http.MultipartRequest request = http.MultipartRequest(
       'POST',
-      Uri.parse("http://52.66.199.213:5000/PostVideoToId"),
+      Uri.parse("${URL}PostVideoToId"),
     );
     final Map<String, String> headers = {
       "Content-type": "multipart/form-data",
@@ -243,8 +239,7 @@ class _MessagePageState extends State<MessagePage> {
       return ViewImage(
           Token: widget.Token,
           Tag: index.toString(),
-          url:
-              "http://52.66.199.213:5000/messageimage/id=${widget.messageId}&i=$index");
+          url: "${URL}messageimage/id=${widget.messageId}&i=$index");
     }));
   }
 
@@ -261,18 +256,19 @@ class _MessagePageState extends State<MessagePage> {
                   child: CircleAvatar(
                     radius: MediaQuery.of(context).size.height * 0.1,
                     foregroundImage: NetworkImage(
-                        "http://52.66.199.213:5000/profile/get/jwt=${widget.Token}&uid=${widget.Senderuid}"),
+                        "${URL}profile/get/jwt=${widget.Token}&uid=${widget.Senderuid}"),
                   )),
               Text(widget.SenderName),
               ListView.builder(itemBuilder: ((context, index) {
                 return ConstrainedBox(
-                    constraints: BoxConstraints(maxHeight: 100, maxWidth: 100),
+                    constraints:
+                        const BoxConstraints(maxHeight: 100, maxWidth: 100),
                     child: Hero(
                       tag: "photo" + index.toString(),
                       child: NetworkImg(
                         Token: widget.Token,
                         url:
-                            "http://52.66.199.213:5000/messageimage/id=${widget.messageId}&i=$index",
+                            "${URL}messageimage/id=${widget.messageId}&i=$index",
                       ),
                     ));
               })),
@@ -306,7 +302,7 @@ class _MessagePageState extends State<MessagePage> {
               tag: "ProfilePhoto",
               child: CircleAvatar(
                 foregroundImage: NetworkImage(
-                    "http://52.66.199.213:5000/profile/get/jwt=${widget.Token}&uid=${widget.Senderuid}"),
+                    "${URL}profile/get/jwt=${widget.Token}&uid=${widget.Senderuid}"),
               ),
             ),
             Padding(
@@ -365,7 +361,7 @@ class _MessagePageState extends State<MessagePage> {
                                                           child: NetworkImg(
                                                             Token: widget.Token,
                                                             url:
-                                                                "http://52.66.199.213:5000/messageimage/id=${widget.messageId}&i=$index",
+                                                                "${URL}messageimage/id=${widget.messageId}&i=$index",
                                                           ),
                                                         )),
                                                   ),
@@ -385,7 +381,7 @@ class _MessagePageState extends State<MessagePage> {
                                                         color: Colors.black,
                                                         child: const Center(
                                                             child:
-                                                                const CircularProgressIndicator()),
+                                                                CircularProgressIndicator()),
                                                       ),
                                                     )
                                                   : VideoInChat(

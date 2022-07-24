@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:baata/Screens/home/newmessage.dart';
+import 'package:baata/consts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:share_plus/share_plus.dart';
 
 class contactTile extends StatefulWidget {
   final String Token;
@@ -50,7 +52,10 @@ class _contactTileState extends State<contactTile> {
     super.initState();
   }
 
-  void inviteFunction() {}
+  void inviteFunction() => Share.share(
+      'check out my website https://example.com',
+      subject:
+          "Lets Chat on Baata It's a Fast Simple And Secure Chat App we can use to message each other for free. Get it at https://baata.ml");
 
   @override
   Widget build(BuildContext context) {
@@ -71,16 +76,19 @@ class _contactTileState extends State<contactTile> {
       leading: CircleAvatar(
         radius: 40,
         foregroundImage: NetworkImage(
-            "http://52.66.199.213:5000/contact/get/jwt=${widget.Token}&pno=${widget.PhoneNumber}"),
+            "${URL}contact/get/jwt=${widget.Token}&pno=${widget.PhoneNumber}"),
         onForegroundImageError: (o, e) => {},
         backgroundColor: Colors.black,
-        child: Text(widget.DisplayName.substring(0, 2)),
+        child: Text(widget.DisplayName.length > 2
+            ? widget.DisplayName.substring(0, 2)
+            : widget.DisplayName),
       ),
       title: Text(widget.DisplayName),
       subtitle: Text(status == null ? widget.PhoneNumber : status!),
       trailing: isUser
           ? null
-          : ElevatedButton(onPressed: inviteFunction, child: Text("Invite")),
+          : ElevatedButton(
+              onPressed: inviteFunction, child: const Text("Invite")),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:baata/consts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -26,8 +27,7 @@ class _newMessageStartState extends State<newMessageStart> {
   void GetMessages() async {
     print('getMessages');
     var data = await get(
-        Uri.parse(
-            'http://52.66.199.213:5000/GetChatFromUid/uid=${widget.data['uid']}'),
+        Uri.parse('${URL}GetChatFromUid/uid=${widget.data['uid']}'),
         headers: {"jwt": widget.Token});
     print(data.body);
 
@@ -49,27 +49,17 @@ class _newMessageStartState extends State<newMessageStart> {
   }
 
   void UpdateMessagesWithId(id) async {
-    print("update message with id");
-    Response res = await post(
-        Uri.parse('http://52.66.199.213:5000/getMessageFormid'),
-        headers: {"jwt": widget.Token},
-        body: jsonEncode({"id": id}));
-    print(res.body);
+    Response res = await post(Uri.parse('${URL}getMessageFormid'),
+        headers: {"jwt": widget.Token}, body: jsonEncode({"id": id}));
     ChatMessages = jsonDecode(res.body);
     chatState = "E";
     chatid = id;
-    print(chatid);
-    print(id);
     setState(() {});
   }
 
   void StartMessaging(Map message) async {
-    print("start messaging");
-    Response res = await post(
-        Uri.parse('http://52.66.199.213:5000/StartMessagingWithNewContact'),
-        headers: {"jwt": widget.Token},
-        body: jsonEncode(message));
-    print(res.body);
+    Response res = await post(Uri.parse('${URL}StartMessagingWithNewContact'),
+        headers: {"jwt": widget.Token}, body: jsonEncode(message));
     widget.updatehome();
     UpdateMessagesWithId(res.body);
   }
@@ -78,16 +68,15 @@ class _newMessageStartState extends State<newMessageStart> {
       {required String id,
       required String textmessage,
       required bool isMedia}) async {
-    Response res =
-        await post(Uri.parse('http://52.66.199.213:5000/postMessageToId'),
-            headers: {"jwt": widget.Token},
-            body: jsonEncode({
-              "id": id,
-              "Sender": selfUid,
-              "messageTime": DateTime.now().millisecondsSinceEpoch,
-              "MessageText": textmessage,
-              "isMedia": isMedia
-            }));
+    Response res = await post(Uri.parse('${URL}postMessageToId'),
+        headers: {"jwt": widget.Token},
+        body: jsonEncode({
+          "id": id,
+          "Sender": selfUid,
+          "messageTime": DateTime.now().millisecondsSinceEpoch,
+          "MessageText": textmessage,
+          "isMedia": isMedia
+        }));
     UpdateMessagesWithId(id);
   }
 
@@ -99,7 +88,7 @@ class _newMessageStartState extends State<newMessageStart> {
             title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
           CircleAvatar(
             foregroundImage: NetworkImage(
-                "http://52.66.199.213:5000/contact/get/jwt=${widget.Token}&pno=${widget.data['phonenumber']}"),
+                "${URL}contact/get/jwt=${widget.Token}&pno=${widget.data['phonenumber']}"),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),

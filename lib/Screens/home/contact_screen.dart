@@ -1,9 +1,7 @@
 import 'package:baata/Screens/home/contact.dart';
-import 'package:baata/Screens/home/messagePage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:http/http.dart';
 
 class ContactSelector extends StatefulWidget {
   final Function updatehome;
@@ -56,14 +54,14 @@ class _ContactSelectorState extends State<ContactSelector> {
                 width: MediaQuery.of(context).size.width * 0.8,
                 child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.search,
                       color: Colors.orange,
                     ),
                     Expanded(
                       child: TextField(
-                        style: TextStyle(color: Colors.black),
-                        decoration: InputDecoration(
+                        style: const TextStyle(color: Colors.black),
+                        decoration: const InputDecoration(
                             hintStyle: TextStyle(color: Colors.black54),
                             hintText: "  Search Your Contacts"),
                         controller: SearchController,
@@ -91,9 +89,8 @@ class _ContactSelectorState extends State<ContactSelector> {
                 if (!Phonenumber.startsWith("+91")) {
                   Phonenumber = "+91" + Phonenumber;
                 }
-                Contact cc = ContactList![index];
                 return contactTile(
-                  DisplayName: cc.displayName,
+                  DisplayName: ContactList![index].displayName,
                   PhoneNumber: Phonenumber,
                   Token: idToken!,
                   uid: uid,

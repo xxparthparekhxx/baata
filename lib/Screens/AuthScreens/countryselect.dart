@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'AuthWidgets/countrycodeslist.dart' as c;
 
 class CountrySelect extends StatefulWidget {
-  Function CountryListTile;
-  CountrySelect({Key? key, required this.CountryListTile}) : super(key: key);
+  final Function CountryListTile;
+  const CountrySelect({Key? key, required this.CountryListTile})
+      : super(key: key);
 
   @override
   State<CountrySelect> createState() => _CountrySelectState();
@@ -14,15 +15,13 @@ class _CountrySelectState extends State<CountrySelect> {
   @override
   Widget build(BuildContext context) {
     var ss = MediaQuery.of(context).size;
-    country_Controller.addListener(() => setState(() {
-          print(country_Controller.text);
-        }));
-    return Container(
+    country_Controller.addListener(() => setState(() {}));
+    return SizedBox(
       height: ss.height,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Container(
+          SizedBox(
             width: ss.width,
             height: ss.height * 0.9 - MediaQuery.of(context).viewInsets.bottom,
             child: ListView.builder(
@@ -54,6 +53,5 @@ class _CountrySelectState extends State<CountrySelect> {
         ],
       ),
     );
-    ;
   }
 }

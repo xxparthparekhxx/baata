@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:baata/consts.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'dart:io';
@@ -38,75 +39,75 @@ class _displayphotoState extends State<displayphoto> {
     });
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse("http://52.66.199.213:5000/PostImageToId"),
+      Uri.parse("${URL}PostImageToId"),
     );
     Map<String, String> headers = {
       "Content-type": "multipart/form-data",
       "jwt": widget.token
     };
-    Map<String,Object> meta = {
-          "id": id,
-          "Sender": widget.selfuid,
-          "messageTime": DateTime.now().millisecondsSinceEpoch,
-          "MessageText": Message.text,
-          "isMedia": true,
-          "MediaType": "Image"
-        };
+    Map<String, Object> meta = {
+      "id": id,
+      "Sender": widget.selfuid,
+      "messageTime": DateTime.now().millisecondsSinceEpoch,
+      "MessageText": Message.text,
+      "isMedia": true,
+      "MediaType": "Image"
+    };
     request.fields['data'] = jsonEncode(meta);
     request.files.add(http.MultipartFile(
         'image', Image.readAsBytes().asStream(), Image.lengthSync(),
         filename: ''));
-    
 
     request.headers.addAll(headers);
     var res = await request.send();
     http.Response response = await http.Response.fromStream(res);
     print(response.statusCode);
-    if(response.statusCode == 200){
-      
+    if (response.statusCode == 200) {
       Navigator.pop(context);
       Navigator.pop(context);
     }
   }
 
-  Future<Null> _cropImage() async {
-    File? croppedFile = await ImageCropper.cropImage(
-        sourcePath: widget.image.path,
-        aspectRatioPresets: Platform.isAndroid
-            ? [
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio16x9
-              ]
-            : [
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio5x3,
-                CropAspectRatioPreset.ratio5x4,
-                CropAspectRatioPreset.ratio7x5,
-                CropAspectRatioPreset.ratio16x9
-              ],
-        androidUiSettings: const AndroidUiSettings(
+  Future<void> _cropImage() async {
+    CroppedFile? croppedFile = (await ImageCropper().cropImage(
+      sourcePath: widget.image.path,
+      aspectRatioPresets: Platform.isAndroid
+          ? [
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio3x2,
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPreset.ratio16x9
+            ]
+          : [
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio3x2,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPreset.ratio5x3,
+              CropAspectRatioPreset.ratio5x4,
+              CropAspectRatioPreset.ratio7x5,
+              CropAspectRatioPreset.ratio16x9
+            ],
+      uiSettings: [
+        AndroidUiSettings(
             toolbarTitle: 'Resize your image',
             toolbarColor: Colors.orange,
             toolbarWidgetColor: Colors.white,
             initAspectRatio: CropAspectRatioPreset.original,
-            lockAspectRatio: false
-            showCropGrid: false
-            ),
-        iosUiSettings: const IOSUiSettings(
+            lockAspectRatio: false,
+            showCropGrid: false),
+        IOSUiSettings(
           title: 'Resize Your Image',
-        ));
+        )
+      ],
+    ));
     if (croppedFile != null) {
-      imageFile = croppedFile;
+      imageFile = File(croppedFile.path);
       setState(() {});
     }
-
   }
+
   bool uploading = false;
   @override
   Widget build(BuildContext context) {
@@ -170,7 +171,8 @@ class _displayphotoState extends State<displayphoto> {
                                 controller: Message,
                                 decoration: InputDecoration(
                                     hintText: "Message",
-                                    hintStyle: const TextStyle(color: Colors.black12),
+                                    hintStyle:
+                                        const TextStyle(color: Colors.black12),
                                     border: InputBorder.none,
                                     constraints: BoxConstraints(
                                       maxWidth:
@@ -182,33 +184,37 @@ class _displayphotoState extends State<displayphoto> {
                           ),
                         ),
                       ),
-                     !uploading? Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(30)),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(30),
-                            splashColor: Colors.black,
-                            onTap: () {
-                              sendImagetoid(
-                                  id: widget.chatid, Image: imageFile!);
+                      !uploading
+                          ? Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.orange,
+                                    borderRadius: BorderRadius.circular(30)),
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(30),
+                                  splashColor: Colors.black,
+                                  onTap: () {
+                                    sendImagetoid(
+                                        id: widget.chatid, Image: imageFile!);
 
-                              //todo implement sendind data
-                              // text will have sender_uid,Text,time, and it will retrive the new chat id and messages then ss
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.all(15.0),
-                              child: Icon(Icons.send),
-                            ),
-                          ),
-                        ),
-                      ):
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10),
-                        child:  CircularProgressIndicator(backgroundColor: Colors.black,),
-                      )
+                                    //todo implement sendind data
+                                    // text will have sender_uid,Text,time, and it will retrive the new chat id and messages then ss
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(15.0),
+                                    child: Icon(Icons.send),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: CircularProgressIndicator(
+                                backgroundColor: Colors.black,
+                              ),
+                            )
                     ],
                   )),
             ],

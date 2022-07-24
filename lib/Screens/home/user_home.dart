@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:baata/Screens/home/drawer.dart';
 import 'package:baata/Screens/home/messagePage.dart';
+import 'package:baata/consts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -39,8 +40,8 @@ class _UserHomeState extends State<UserHome> {
     while (!updateDone) {
       try {
         token = await widget.user.getIdToken();
-        http.Response res = await http.get(Uri.parse(
-            "http://52.66.199.213:5000/profile/getMessage/metadata/jwt=$token"));
+        http.Response res = await http
+            .get(Uri.parse("${URL}profile/getMessage/metadata/jwt=$token"));
         MessageList = jsonDecode(res.body);
         setState(() {});
         if (res.statusCode == 200) {
@@ -67,7 +68,7 @@ class _UserHomeState extends State<UserHome> {
   void updateMessagingToken() async {
     final String messagingtoken = await messaging.getToken() ?? "";
     final http.Response res = await http.post(
-        Uri.parse("http://52.66.199.213:5000/profile/SetFmcToken"),
+        Uri.parse("${URL}profile/SetFmcToken"),
         body: jsonEncode({"Fmc": messagingtoken}),
         headers: {"jwt": token!});
   }
@@ -144,7 +145,7 @@ class _UserHomeState extends State<UserHome> {
                                   radius: 30,
                                   backgroundColor: Colors.black,
                                   foregroundImage: NetworkImage(
-                                      "http://52.66.199.213:5000/profile/get/jwt=$token&uid=$sender",
+                                      "${URL}profile/get/jwt=$token&uid=$sender",
                                       headers: {"Keep-Alive": "timeout=10"}),
                                 ),
                                 Padding(

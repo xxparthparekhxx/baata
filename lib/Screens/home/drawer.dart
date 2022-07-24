@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:baata/Screens/home/contact_screen.dart';
 import 'package:baata/Screens/profile/update_profile.dart';
+import 'package:baata/consts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -40,8 +41,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
   }
 
   void GetName() async {
-    Response res = await post(
-        Uri.parse("http://52.66.199.213:5000/profile/Getname"),
+    Response res = await post(Uri.parse("${URL}profile/Getname"),
         headers: {"jwt": JWTToken!});
     Name = res.body;
     setState(() {});
@@ -74,7 +74,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                           radius: 40,
                           foregroundImage: JWTToken != null
                               ? NetworkImage(
-                                  "http://52.66.199.213:5000/contact/get/jwt=${JWTToken!}&pno=${widget.user.phoneNumber}")
+                                  "${URL}contact/get/jwt=${JWTToken!}&pno=${widget.user.phoneNumber}")
                               : null,
                         ),
                         InkWell(
@@ -129,15 +129,15 @@ class _CustomDrawerState extends State<CustomDrawer> {
             title: const Text("Contacts"),
           ),
           ListTile(
-            onTap: () =>
-                Navigator.push(context, MaterialPageRoute(builder: (c) {
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (c) {
               return UpdatePfp(
                 Name: Name!,
                 user: widget.user,
                 JWT: JWTToken!,
               );
-            })).then((value) =>
-                    {imageCache?.clear(), imageCache?.clearLiveImages()}),
+            })).then(
+                (value) => {imageCache.clear(), imageCache.clearLiveImages()}),
             leading: const Icon(Icons.person),
             title: const Text("Profile"),
           ),

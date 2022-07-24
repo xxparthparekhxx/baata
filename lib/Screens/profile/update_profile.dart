@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:baata/consts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -13,7 +13,8 @@ class UpdatePfp extends StatefulWidget {
   final User user;
   final String JWT;
 
-  const UpdatePfp({required this.Name, required this.user, required this.JWT});
+  const UpdatePfp(
+      {Key? key, required this.Name, required this.user, required this.JWT});
 
   @override
   _UpdatePfpState createState() => _UpdatePfpState();
@@ -27,44 +28,43 @@ enum AppState {
 
 class _UpdatePfpState extends State<UpdatePfp> {
   void _cropImage() async {
-    File? croppedFile = await ImageCropper.cropImage(
-        sourcePath: imgPath!,
-        aspectRatioPresets: Platform.isAndroid
-            ? [
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio16x9
-              ]
-            : [
-                CropAspectRatioPreset.original,
-                CropAspectRatioPreset.square,
-                CropAspectRatioPreset.ratio3x2,
-                CropAspectRatioPreset.ratio4x3,
-                CropAspectRatioPreset.ratio5x3,
-                CropAspectRatioPreset.ratio5x4,
-                CropAspectRatioPreset.ratio7x5,
-                CropAspectRatioPreset.ratio16x9
-              ],
-        androidUiSettings: const AndroidUiSettings(
+    CroppedFile? croppedFile = (await ImageCropper().cropImage(
+      sourcePath: imgPath!,
+      aspectRatioPresets: Platform.isAndroid
+          ? [
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio3x2,
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPreset.ratio16x9
+            ]
+          : [
+              CropAspectRatioPreset.original,
+              CropAspectRatioPreset.square,
+              CropAspectRatioPreset.ratio3x2,
+              CropAspectRatioPreset.ratio4x3,
+              CropAspectRatioPreset.ratio5x3,
+              CropAspectRatioPreset.ratio5x4,
+              CropAspectRatioPreset.ratio7x5,
+              CropAspectRatioPreset.ratio16x9
+            ],
+      uiSettings: [
+        AndroidUiSettings(
             toolbarTitle: 'Resize your image',
             toolbarColor: Colors.orange,
             toolbarWidgetColor: Colors.white,
             initAspectRatio: CropAspectRatioPreset.original,
-            lockAspectRatio: false
-            showCropGrid: false
-            ),
-        iosUiSettings: const IOSUiSettings(
+            lockAspectRatio: false,
+            showCropGrid: false),
+        IOSUiSettings(
           title: 'Resize Your Image',
-        ));
+        )
+      ],
+    ));
     if (croppedFile != null) {
       imgPath = croppedFile.path;
-      setState(() {
-
-      });
+      setState(() {});
     }
-
   }
 
   InputDecoration inputDecor(label, hintText) {
@@ -92,7 +92,6 @@ class _UpdatePfpState extends State<UpdatePfp> {
                     });
                     Navigator.pop(context);
                   }
-                  print(imgPath);
                 },
                 leading: const Icon(Icons.camera),
                 title: const Text("Camera"),
@@ -106,7 +105,6 @@ class _UpdatePfpState extends State<UpdatePfp> {
                       imgPath = Img.path;
                     });
                     Navigator.pop(context);
-                    print(imgPath);
                   }
                 },
                 leading: const Icon(Icons.photo),
@@ -119,10 +117,9 @@ class _UpdatePfpState extends State<UpdatePfp> {
 
   void getStatus() async {
     var res = await http.get(Uri.parse(
-        "http://52.66.199.213:5000/status/get/jwt=${widget.JWT}&uid=${widget.user.phoneNumber}"));
+        "${URL}status/get/jwt=${widget.JWT}&uid=${widget.user.phoneNumber}"));
     setState(() {
       Status = jsonDecode(res.body)['status'];
-      print(Status);
     });
   }
 
@@ -132,8 +129,8 @@ class _UpdatePfpState extends State<UpdatePfp> {
     super.initState();
   }
 
-  TextEditingController NameController = TextEditingController();
-  TextEditingController StatusController = TextEditingController();
+  final TextEditingController NameController = TextEditingController();
+  final TextEditingController StatusController = TextEditingController();
 
   String? Status;
   @override
@@ -150,7 +147,7 @@ class _UpdatePfpState extends State<UpdatePfp> {
                 imgPath == null
                     ? CircleAvatar(
                         foregroundImage: NetworkImage(
-                          "http://52.66.199.213:5000/contact/get/jwt=${widget.JWT}&pno=${widget.user.phoneNumber}",
+                          "${URL}contact/get/jwt=${widget.JWT}&pno=${widget.user.phoneNumber}",
                         ),
                         maxRadius: sw.width * 0.3,
                       )
@@ -158,7 +155,7 @@ class _UpdatePfpState extends State<UpdatePfp> {
                         foregroundImage: FileImage(File(imgPath!)),
                         maxRadius: sw.width * 0.3,
                       ),
-                Container(
+                SizedBox(
                   height: sw.height * 0.3,
                   width: sw.width * 0.6,
                   child: Column(
@@ -186,7 +183,7 @@ class _UpdatePfpState extends State<UpdatePfp> {
                   ),
                 ),
                 if (imgPath != null)
-                  Container(
+                  SizedBox(
                     height: sw.height * 0.3,
                     width: sw.width * 0.6,
                     child: Column(
@@ -228,7 +225,7 @@ class _UpdatePfpState extends State<UpdatePfp> {
                   constraints: BoxConstraints(maxWidth: sw.width * 0.6),
                   child: TextField(
                     controller: NameController,
-                    decoration: inputDecor( widget.Name,"Name"),
+                    decoration: inputDecor(widget.Name, "Name"),
                   ),
                 )
               ],
@@ -243,7 +240,7 @@ class _UpdatePfpState extends State<UpdatePfp> {
                   constraints: BoxConstraints(maxWidth: sw.width * 0.6),
                   child: TextField(
                     controller: StatusController,
-                    decoration: inputDecor( Status ?? '',"Status"),
+                    decoration: inputDecor(Status ?? '', "Status"),
                   ),
                 )
               ],
@@ -272,7 +269,7 @@ class _UpdatePfpState extends State<UpdatePfp> {
                         };
                         var request = http.MultipartRequest(
                           'POST',
-                          Uri.parse("http://52.66.199.213:5000/UpdateProfile"),
+                          Uri.parse("${URL}UpdateProfile"),
                         );
 
                         Map<String, String> headers = {

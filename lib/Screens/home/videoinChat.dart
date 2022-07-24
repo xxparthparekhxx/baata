@@ -1,6 +1,5 @@
-import 'dart:typed_data';
-
 import 'package:baata/Screens/home/videoplayer.dart';
+import 'package:baata/consts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +8,7 @@ class VideoInChat extends StatefulWidget {
   final String Token;
   final int index;
   final String messageId;
-  VideoInChat({
+  const VideoInChat({
     Key? key,
     required this.decoration,
     required this.Token,
@@ -45,13 +44,13 @@ class _VideoInChatState extends State<VideoInChat> {
         decoration: widget.decoration,
         child: GestureDetector(
             onTap: () => displayvideo(
-                "http://52.66.199.213:5000/messageVideo/id=${widget.messageId}&i=${widget.index}"),
+                "${URL}messageVideo/id=${widget.messageId}&i=${widget.index}"),
             child: Container(
                 color: Colors.black,
                 child: Stack(alignment: AlignmentDirectional.center, children: [
                   CachedNetworkImage(
                     imageUrl:
-                        "http://52.66.199.213:5000/getVidThumb/id=${widget.messageId}idx=${widget.index}",
+                        "${URL}getVidThumb/id=${widget.messageId}idx=${widget.index}",
                     httpHeaders: {"jwt": widget.Token},
                   ),
                   const Icon(Icons.play_arrow_sharp)

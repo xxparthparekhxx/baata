@@ -178,3 +178,4 @@ android/gradle/wrapper/gradle-wrapper.properties
 .gradle/checksums/checksums.lock
 .gradle/configuration-cache/gc.properties
 .gradle/vcs-1/gc.properties
+lib/firebase_options.dart

@@ -1,6 +1,5 @@
 import 'package:baata/Screens/AuthScreens/AuthWidgets/connect_with_animation.dart';
 import 'package:baata/Screens/AuthScreens/AuthWidgets/messageflowanimation.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -64,7 +63,7 @@ class WelcomeScreen extends StatelessWidget {
                   },
                   child: Padding(
                       padding: const EdgeInsets.all(15.0),
-                      child: Container(
+                      child: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.75,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
