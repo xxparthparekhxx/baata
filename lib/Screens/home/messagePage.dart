@@ -12,19 +12,24 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MessagePage extends StatefulWidget {
   final String Senderuid;
-  final String messageId;
+  late final String messageId;
   final String SenderName;
   final String Token;
-  const MessagePage(
+  final Map message;
+  MessagePage(
       {Key? key,
-      required this.messageId,
+      required this.message,
       required this.Senderuid,
       required this.SenderName,
       required this.Token})
-      : super(key: key);
+      : super(key: key) {
+    messageId = (message['_id']);
+    print(message);
+  }
 
   @override
   _MessagePageState createState() => _MessagePageState();
@@ -50,12 +55,18 @@ class _MessagePageState extends State<MessagePage> {
   }
 
   void UpdateMessagesWithId(id) async {
+    var instance = await SharedPreferences.getInstance();
+    if (ChatMessages == null) {
+      ChatMessages =
+          jsonDecode(instance.getString("messages_" + id.toString()) ?? "[]");
+      setState(() {});
+      jupmtobottom();
+    }
+
     Response res = await post(Uri.parse('${URL}getMessageFormid'),
         headers: {"jwt": widget.Token}, body: jsonEncode({"id": id}));
-
     ChatMessages = jsonDecode(res.body);
     chatState = "E";
-    print(ChatMessages);
     setState(() {});
     jupmtobottom();
   }
@@ -63,7 +74,6 @@ class _MessagePageState extends State<MessagePage> {
   void StartMessaging(Map message) async {
     Response res = await post(Uri.parse('${URL}StartMessagingWithNewContact'),
         headers: {"jwt": widget.Token}, body: jsonEncode(message));
-
     UpdateMessagesWithId(res.body);
   }
 
@@ -245,37 +255,7 @@ class _MessagePageState extends State<MessagePage> {
 
   void Displayprofile() {
     Navigator.push(context, MaterialPageRoute(builder: (c) {
-      return Scaffold(
-        body:
-            Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Hero(
-                  tag: "ProfilePhoto",
-                  child: CircleAvatar(
-                    radius: MediaQuery.of(context).size.height * 0.1,
-                    foregroundImage: NetworkImage(
-                        "${URL}profile/get/jwt=${widget.Token}&uid=${widget.Senderuid}"),
-                  )),
-              Text(widget.SenderName),
-              ListView.builder(itemBuilder: ((context, index) {
-                return ConstrainedBox(
-                    constraints:
-                        const BoxConstraints(maxHeight: 100, maxWidth: 100),
-                    child: Hero(
-                      tag: "photo" + index.toString(),
-                      child: NetworkImg(
-                        Token: widget.Token,
-                        url:
-                            "${URL}messageimage/id=${widget.messageId}&i=$index",
-                      ),
-                    ));
-              })),
-            ],
-          )
-        ]),
-      );
+      return DisplayProfilePhotoOfMessenger(context: context, widget: widget);
     }));
   }
 
@@ -497,5 +477,49 @@ class _MessagePageState extends State<MessagePage> {
                   )
                 ],
               ));
+  }
+}
+
+class DisplayProfilePhotoOfMessenger extends StatelessWidget {
+  const DisplayProfilePhotoOfMessenger({
+    Key? key,
+    required this.context,
+    required this.widget,
+  }) : super(key: key);
+
+  final BuildContext context;
+  final MessagePage widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Hero(
+                tag: "ProfilePhoto",
+                child: CircleAvatar(
+                  radius: MediaQuery.of(context).size.height * 0.1,
+                  foregroundImage: NetworkImage(
+                      "${URL}profile/get/jwt=${widget.Token}&uid=${widget.Senderuid}"),
+                )),
+            Text(widget.SenderName),
+            ListView.builder(itemBuilder: ((context, index) {
+              return ConstrainedBox(
+                  constraints:
+                      const BoxConstraints(maxHeight: 100, maxWidth: 100),
+                  child: Hero(
+                    tag: "photo" + index.toString(),
+                    child: NetworkImg(
+                      Token: widget.Token,
+                      url: "${URL}messageimage/id=${widget.messageId}&i=$index",
+                    ),
+                  ));
+            })),
+          ],
+        )
+      ]),
+    );
   }
 }

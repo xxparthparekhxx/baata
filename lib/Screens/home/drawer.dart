@@ -2,9 +2,11 @@ import 'dart:async';
 import 'package:baata/Screens/home/contact_screen.dart';
 import 'package:baata/Screens/profile/update_profile.dart';
 import 'package:baata/consts.dart';
+import 'package:baata/providers/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:provider/provider.dart';
 
 class CustomDrawer extends StatefulWidget {
   User user;
@@ -30,12 +32,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
   String? JWTToken;
 
   void getToken() async {
-    JWTToken = await widget.user.getIdToken();
+    JWTToken = Provider.of<Auth>(context, listen: false).token;
 
     GetName();
     if (mounted) setState(() {});
     Timer.periodic(const Duration(hours: 1), (timer) async {
-      JWTToken = await widget.user.getIdToken();
+      JWTToken = Provider.of<Auth>(context, listen: false).token;
       setState(() {});
     });
   }
@@ -50,9 +52,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
   NetworkImage? image;
   @override
   void initState() {
-    getToken();
-
     super.initState();
+    getToken();
   }
 
   @override

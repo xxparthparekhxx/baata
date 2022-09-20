@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'AuthWidgets/countrycodeslist.dart' as c;
+import './Widgets/countrycodeslist.dart';
 
 class CountrySelect extends StatefulWidget {
   final Function CountryListTile;
@@ -27,7 +27,7 @@ class _CountrySelectState extends State<CountrySelect> {
             child: ListView.builder(
               reverse: true,
               itemBuilder: (ctx, idx) {
-                final Map<String, String> Data = c.COUNTRY_EXTENSIONS[idx];
+                final Map<String, String> Data = COUNTRY_EXTENSIONS[idx];
                 if (Data['name']!
                         .toLowerCase()
                         .startsWith(country_Controller.text.toLowerCase()) ||
@@ -37,7 +37,7 @@ class _CountrySelectState extends State<CountrySelect> {
                   return const SizedBox();
                 }
               },
-              itemCount: c.COUNTRY_EXTENSIONS.length,
+              itemCount: COUNTRY_EXTENSIONS.length,
             ),
           ),
           Padding(

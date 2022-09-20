@@ -1,7 +1,9 @@
 import 'package:baata/Screens/home/contact.dart';
+import 'package:baata/providers/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:provider/provider.dart';
 
 class ContactSelector extends StatefulWidget {
   final Function updatehome;
@@ -21,12 +23,13 @@ class _ContactSelectorState extends State<ContactSelector> {
     if (await FlutterContacts.requestPermission()) {
       // Get all contacts (lightly fetched)
       ContactList = await FlutterContacts.getContacts(withProperties: true);
+
       setState(() {});
     }
   }
 
   Future<void> tokenGetter() async {
-    idToken = await FirebaseAuth.instance.currentUser!.getIdToken();
+    idToken = Provider.of<Auth>(context, listen: false).token;
   }
 
   @override

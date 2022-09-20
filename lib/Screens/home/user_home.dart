@@ -4,12 +4,15 @@ import 'dart:convert';
 import 'package:baata/Screens/home/drawer.dart';
 import 'package:baata/Screens/home/messagePage.dart';
 import 'package:baata/consts.dart';
+import 'package:baata/providers/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserHome extends StatefulWidget {
   final User user;
@@ -35,15 +38,22 @@ class _UserHomeState extends State<UserHome> {
   String? token;
   String? newinitialId;
   void FetchuserMessages() async {
+    var instance = await SharedPreferences.getInstance();
+    MessageList = jsonDecode(
+        instance.getString(FirebaseAuth.instance.currentUser!.uid) ?? "[]");
+    setState(() {});
     bool updateDone = false;
 
     while (!updateDone) {
       try {
-        token = await widget.user.getIdToken();
+        token = await FirebaseAuth.instance.currentUser!.getIdToken();
         http.Response res = await http
             .get(Uri.parse("${URL}profile/getMessage/metadata/jwt=$token"));
+
         MessageList = jsonDecode(res.body);
         setState(() {});
+        await instance.setString(
+            FirebaseAuth.instance.currentUser!.uid, res.body);
         if (res.statusCode == 200) {
           updateDone = true;
         } else {
@@ -57,10 +67,10 @@ class _UserHomeState extends State<UserHome> {
   }
 
   void getToken() async {
-    token = await widget.user.getIdToken();
+    token = await FirebaseAuth.instance.currentUser!.getIdToken();
     setState(() {});
     Timer.periodic(const Duration(minutes: 10), (timer) async {
-      token = await widget.user.getIdToken();
+      token = await FirebaseAuth.instance.currentUser!.getIdToken();
       setState(() {});
     });
   }
@@ -76,8 +86,8 @@ class _UserHomeState extends State<UserHome> {
   @override
   void initState() {
     getToken();
-    updateMessagingToken();
     FetchuserMessages();
+    updateMessagingToken();
     super.initState();
   }
 
@@ -107,6 +117,7 @@ class _UserHomeState extends State<UserHome> {
           : Padding(
               padding: const EdgeInsets.symmetric(vertical: 10.0),
               child: ListView.builder(
+                reverse: true,
                 itemCount: MessageList!.length,
                 itemBuilder: (context, index) {
                   final String sender =
@@ -129,7 +140,7 @@ class _UserHomeState extends State<UserHome> {
                         Navigator.of(context)
                             .push(MaterialPageRoute(builder: (c) {
                           return MessagePage(
-                            messageId: MessageList![index]['_id'],
+                            message: MessageList![index],
                             Senderuid: sender,
                             SenderName: senderName,
                             Token: token!,

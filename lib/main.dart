@@ -1,5 +1,8 @@
 import 'package:baata/firebase_options.dart';
+import 'package:baata/providers/auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 // Import the firebase_core plugin
 import 'root.dart';
 import 'Screens/ff_init/loading.dart';
@@ -59,6 +62,8 @@ class _AppState extends State<App> {
       return const Loading();
     }
 
-    return const MainApp();
+    return MultiProvider(providers: [
+      ChangeNotifierProvider(create: (c) => Auth(FirebaseAuth.instance))
+    ], child: const MainApp());
   }
 }

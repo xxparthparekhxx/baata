@@ -1,10 +1,10 @@
-import 'package:baata/Screens/AuthScreens/AuthWidgets/connect_with_animation.dart';
-import 'package:baata/Screens/AuthScreens/AuthWidgets/messageflowanimation.dart';
+import 'package:baata/Screens/AuthScreens/Widgets/connect_with_animation.dart';
+import 'package:baata/Screens/AuthScreens/Widgets/messageflowanimation.dart';
 import 'package:flutter/material.dart';
 
 class WelcomeScreen extends StatelessWidget {
-  PageController ScreenMaster;
-  WelcomeScreen({Key? key, required this.ScreenMaster}) : super(key: key);
+  final PageController ScreenMaster;
+  const WelcomeScreen({Key? key, required this.ScreenMaster}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

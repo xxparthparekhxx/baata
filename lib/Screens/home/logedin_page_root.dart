@@ -37,7 +37,7 @@ class _loggedinPageState extends State<loggedinPage> {
 
   @override
   Widget build(BuildContext context) {
-    widget.Settings.userDetails().listen((event) {
+    widget.Settings.userDetails(context).listen((event) {
       if (event != data) {
         setState(() {
           data = event;

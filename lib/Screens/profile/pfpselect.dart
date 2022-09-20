@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'package:baata/providers/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class Pfp extends StatefulWidget {
   final String userName;
@@ -42,7 +44,7 @@ class _PfpState extends State<Pfp> {
     );
     Map<String, String> headers = {
       "Content-type": "multipart/form-data",
-      "jwt": await widget.profile.getIdToken()
+      "jwt": Provider.of<Auth>(context, listen: false).token!
     };
     request.files.add(http.MultipartFile(
         'image', imageFile!.readAsBytes().asStream(), imageFile!.lengthSync(),
@@ -145,8 +147,8 @@ class _PfpState extends State<Pfp> {
                     Colors.black,
                     true),
                 const Padding(padding: EdgeInsets.all(10)),
-                customButton(imageFile == null ? "Remain a NPC" : "Reset",
-                    Colors.black, Colors.white, false),
+                // customButton(imageFile == null ? "Remain a NPC" : "Reset",
+                //     Colors.black, Colors.white, false),
               ],
             ),
           ])),

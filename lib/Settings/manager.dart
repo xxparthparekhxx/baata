@@ -2,8 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:baata/consts.dart';
+import 'package:baata/providers/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 enum UserStates {
   existing,
@@ -25,11 +28,11 @@ class uManager {
     );
   }
 
-  Stream<UserStates> userDetails() async* {
+  Stream<UserStates> userDetails(context) async* {
     const String Address = URL;
     String idtoken;
 
-    idtoken = await person.getIdToken();
+    idtoken = await FirebaseAuth.instance.currentUser!.getIdToken();
 
     http.Response? res;
     while (res == null || res.statusCode != 200) {

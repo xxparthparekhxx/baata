@@ -61,7 +61,6 @@ class _displayphotoState extends State<displayphoto> {
     request.headers.addAll(headers);
     var res = await request.send();
     http.Response response = await http.Response.fromStream(res);
-    print(response.statusCode);
     if (response.statusCode == 200) {
       Navigator.pop(context);
       Navigator.pop(context);
