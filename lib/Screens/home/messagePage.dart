@@ -274,209 +274,200 @@ class _MessagePageState extends State<MessagePage> {
       MIController.jumpTo(MIController.position.maxScrollExtent);
     }
     return Scaffold(
-        appBar: AppBar(
-            title: InkWell(
-          onTap: () => Displayprofile(),
-          child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-            Hero(
-              tag: "ProfilePhoto",
-              child: CircleAvatar(
-                foregroundImage: NetworkImage(
-                    "${URL}profile/get/jwt=${widget.Token}&uid=${widget.Senderuid}"),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Text(widget.SenderName),
-            ),
-          ]),
-        )),
+        appBar: appBar(),
         body: chatState == null
             ? const CircularProgressIndicator()
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  chatState != "New" && ChatMessages != null
-                      ? ConstrainedBox(
-                          constraints: BoxConstraints(
-                              maxHeight: (MediaQuery.of(context).size.height -
-                                      MediaQuery.of(context)
-                                          .viewInsets
-                                          .bottom) -
-                                  153),
-                          child: ListView.builder(
-                            controller: MIController,
-                            itemCount: ChatMessages!.length,
-                            cacheExtent: ChatMessages!.length.toDouble(),
-                            itemBuilder: (BuildContext context, int index) {
-                              sSindexSs = index;
+            : chatMessages(context));
+  }
 
-                              return Row(
-                                mainAxisAlignment:
-                                    ChatMessages![index]['Sender'] == selfUid
-                                        ? MainAxisAlignment.end
-                                        : MainAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: ChatMessages![index]['isMedia']
-                                          ? ChatMessages![index]['MediaType'] ==
-                                                  "Image"
-                                              ? Container(
-                                                  decoration:
-                                                      messagebubble(index),
-                                                  padding:
-                                                      const EdgeInsets.all(10),
-                                                  child: GestureDetector(
-                                                    onTap: () =>
-                                                        DisplayHeroPhoto(index),
-                                                    child: ConstrainedBox(
-                                                        constraints:
-                                                            const BoxConstraints(
-                                                                maxHeight: 175,
-                                                                maxWidth: 200),
-                                                        child: Hero(
-                                                          tag: "photo" +
-                                                              index.toString(),
-                                                          child: NetworkImg(
-                                                            Token: widget.Token,
-                                                            url:
-                                                                "${URL}messageimage/id=${widget.messageId}&i=$index",
-                                                          ),
-                                                        )),
-                                                  ),
-                                                )
-                                              : ChatMessages![index]
-                                                      .keys
-                                                      .contains("up")
-                                                  ? Container(
-                                                      width: 200,
-                                                      height: 200,
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              10),
-                                                      decoration:
-                                                          messagebubble(index),
-                                                      child: Container(
-                                                        color: Colors.black,
-                                                        child: const Center(
-                                                            child:
-                                                                CircularProgressIndicator()),
-                                                      ),
-                                                    )
-                                                  : VideoInChat(
-                                                      Token: widget.Token,
-                                                      decoration:
-                                                          messagebubble(index),
-                                                      index: index,
-                                                      messageId:
-                                                          widget.messageId,
-                                                    )
-                                          : Container(
-                                              constraints: BoxConstraints(
-                                                  maxWidth:
-                                                      MediaQuery.of(context)
-                                                              .size
-                                                              .width *
-                                                          0.8),
-                                              decoration: messagebubble(index),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(10.0),
-                                                child: Text(
-                                                  ChatMessages![index]
-                                                          ['MessageText'] ??
-                                                      ChatMessages![index]
-                                                          ["messageText"],
-                                                  style: const TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 20,
-                                                  ),
-                                                  softWrap: true,
-                                                ),
-                                              ),
-                                            ))
-                                ],
-                              );
-                            },
-                          ),
-                        )
-                      : const Center(child: Text("Start  Messaging")),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(30)),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 10),
-                              TextField(
-                                style: const TextStyle(color: Colors.black),
-                                controller: Message,
-                                decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    constraints: BoxConstraints(
-                                      maxWidth:
-                                          MediaQuery.of(context).size.width -
-                                              130,
-                                    )),
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  prompToPickImage();
-                                },
-                                child: const Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 8.0),
-                                  child: Icon(
-                                    Icons.file_present_sharp,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(30)),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(30),
-                            splashColor: Colors.black,
-                            onTap: () {
-                              Message.text != ''
-                                  ? sendMessageToId(
-                                      id: widget.messageId,
-                                      textmessage: Message.text,
-                                      isMedia: false)
-                                  : null;
+  Column chatMessages(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        chatState != "New" && ChatMessages != null
+            ? ConstrainedBox(
+                constraints: BoxConstraints(
+                    maxHeight: (MediaQuery.of(context).size.height -
+                            MediaQuery.of(context).viewInsets.bottom) -
+                        153),
+                child: ListView.builder(
+                  controller: MIController,
+                  itemCount: ChatMessages!.length,
+                  cacheExtent: ChatMessages!.length.toDouble(),
+                  itemBuilder: (BuildContext context, int index) {
+                    sSindexSs = index;
 
-                              Message.text = '';
-                              //todo implement sendind data
-                              // text will have sender_uid,Text,time, and it will retrive the new chat id and messages then ss
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.all(11.0),
-                              child: Icon(Icons.send),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
+                    return messageRow(index, context);
+                  },
+                ),
+              )
+            : const Center(child: Text("Start  Messaging")),
+        messageInput(context),
+        const SizedBox(
+          height: 10,
+        )
+      ],
+    );
+  }
+
+  Row messageInput(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(30)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Row(
+              children: [
+                const SizedBox(width: 10),
+                TextField(
+                  style: const TextStyle(color: Colors.black),
+                  controller: Message,
+                  decoration: InputDecoration(
+                      border: InputBorder.none,
+                      constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width - 130,
+                      )),
+                ),
+                InkWell(
+                  onTap: () {
+                    prompToPickImage();
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Icon(
+                      Icons.file_present_sharp,
+                      color: Colors.black87,
+                    ),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  )
-                ],
-              ));
+                )
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: Container(
+            decoration: BoxDecoration(
+                color: Colors.orange, borderRadius: BorderRadius.circular(30)),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(30),
+              splashColor: Colors.black,
+              onTap: () {
+                Message.text != ''
+                    ? sendMessageToId(
+                        id: widget.messageId,
+                        textmessage: Message.text,
+                        isMedia: false)
+                    : null;
+
+                Message.text = '';
+                //todo implement sendind data
+                // text will have sender_uid,Text,time, and it will retrive the new chat id and messages then ss
+              },
+              child: const Padding(
+                padding: EdgeInsets.all(11.0),
+                child: Icon(Icons.send),
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  Row messageRow(int index, BuildContext context) {
+    return Row(
+      mainAxisAlignment: ChatMessages![index]['Sender'] == selfUid
+          ? MainAxisAlignment.end
+          : MainAxisAlignment.start,
+      children: [
+        Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ChatMessages![index]['isMedia']
+                ? ChatMessages![index]['MediaType'] == "Image"
+                    ? imageBubble(index)
+                    : ChatMessages![index].keys.contains("up")
+                        ? Container(
+                            width: 200,
+                            height: 200,
+                            padding: const EdgeInsets.all(10),
+                            decoration: messagebubble(index),
+                            child: Container(
+                              color: Colors.black,
+                              child: const Center(
+                                  child: CircularProgressIndicator()),
+                            ),
+                          )
+                        : VideoInChat(
+                            Token: widget.Token,
+                            decoration: messagebubble(index),
+                            index: index,
+                            messageId: widget.messageId,
+                          )
+                : messageBubble(context, index))
+      ],
+    );
+  }
+
+  Container messageBubble(BuildContext context, int index) {
+    return Container(
+      constraints:
+          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
+      decoration: messagebubble(index),
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: SelectableText(
+          ChatMessages![index]['MessageText'] ??
+              ChatMessages![index]["messageText"],
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Container imageBubble(int index) {
+    return Container(
+      decoration: messagebubble(index),
+      padding: const EdgeInsets.all(10),
+      child: GestureDetector(
+        onTap: () => DisplayHeroPhoto(index),
+        child: ConstrainedBox(
+            constraints: const BoxConstraints(maxHeight: 175, maxWidth: 200),
+            child: Hero(
+              tag: "photo" + index.toString(),
+              child: NetworkImg(
+                Token: widget.Token,
+                url: "${URL}messageimage/id=${widget.messageId}&i=$index",
+              ),
+            )),
+      ),
+    );
+  }
+
+  AppBar appBar() {
+    return AppBar(
+        title: InkWell(
+      onTap: () => Displayprofile(),
+      child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+        Hero(
+          tag: "ProfilePhoto",
+          child: CircleAvatar(
+            foregroundImage: NetworkImage(
+                "${URL}profile/get/jwt=${widget.Token}&uid=${widget.Senderuid}"),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Text(widget.SenderName),
+        ),
+      ]),
+    ));
   }
 }
 
@@ -493,33 +484,25 @@ class DisplayProfilePhotoOfMessenger extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Hero(
-                tag: "ProfilePhoto",
-                child: CircleAvatar(
-                  radius: MediaQuery.of(context).size.height * 0.1,
-                  foregroundImage: NetworkImage(
-                      "${URL}profile/get/jwt=${widget.Token}&uid=${widget.Senderuid}"),
-                )),
-            Text(widget.SenderName),
-            ListView.builder(itemBuilder: ((context, index) {
-              return ConstrainedBox(
-                  constraints:
-                      const BoxConstraints(maxHeight: 100, maxWidth: 100),
-                  child: Hero(
-                    tag: "photo" + index.toString(),
-                    child: NetworkImg(
-                      Token: widget.Token,
-                      url: "${URL}messageimage/id=${widget.messageId}&i=$index",
-                    ),
-                  ));
-            })),
-          ],
-        )
-      ]),
+      body: SafeArea(
+        child: Column(children: [
+          Row(),
+          Hero(
+              tag: "ProfilePhoto",
+              child: CircleAvatar(
+                radius: 70,
+                foregroundImage: NetworkImage(
+                    "${URL}profile/get/jwt=${widget.Token}&uid=${widget.Senderuid}"),
+              )),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              widget.SenderName,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+            ),
+          )
+        ]),
+      ),
     );
   }
 }
