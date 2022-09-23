@@ -15,7 +15,14 @@ class _NetworkImgState extends State<NetworkImg> {
   @override
   Widget build(BuildContext context) {
     return CachedNetworkImage(
-      fadeInDuration: const Duration(days: 0),
+      fadeInDuration: const Duration(microseconds: 1),
+      progressIndicatorBuilder: (context, url, progress) {
+        return Center(
+          child: CircularProgressIndicator(value: progress.progress),
+        );
+      },
+      cacheKey: widget.url,
+      filterQuality: FilterQuality.high,
       imageUrl: widget.url,
       httpHeaders: {"jwt": widget.Token},
     );

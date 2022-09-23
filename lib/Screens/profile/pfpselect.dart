@@ -78,7 +78,7 @@ class _PfpState extends State<Pfp> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(text),
               ),
-        style: ElevatedButton.styleFrom(primary: c));
+        style: ElevatedButton.styleFrom(backgroundColor: c));
   }
 
   @override
