@@ -32,7 +32,7 @@ class uManager {
     const String Address = URL;
     String idtoken;
 
-    idtoken = await FirebaseAuth.instance.currentUser!.getIdToken();
+    idtoken = await FirebaseAuth.instance.currentUser!.getIdToken() ?? "";
 
     http.Response? res;
     while (res == null || res.statusCode != 200) {

@@ -51,6 +51,7 @@ class _SignInPageState extends State<SignInPage> {
         });
       },
       codeSent: (String verificationId, int? resendToken) {
+        print(verificationId);
         ScreenMaster.animateToPage(
           2,
           duration: const Duration(milliseconds: 500),
@@ -60,7 +61,9 @@ class _SignInPageState extends State<SignInPage> {
           VerificationId = verificationId;
         });
       },
-      codeAutoRetrievalTimeout: (String verificationId) {},
+      codeAutoRetrievalTimeout: (String verificationId) {
+        print("auto retrival time out");
+      },
     );
   }
 

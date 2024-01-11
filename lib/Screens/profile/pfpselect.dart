@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:baata/consts.dart';
 import 'package:baata/providers/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +41,7 @@ class _PfpState extends State<Pfp> {
   void _uploadFile() async {
     var request = http.MultipartRequest(
       'POST',
-      Uri.parse("https://baatacheet.ml/profile/upload"),
+      Uri.parse("$URL/profile/upload"),
     );
     Map<String, String> headers = {
       "Content-type": "multipart/form-data",

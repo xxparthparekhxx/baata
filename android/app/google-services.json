@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "320232442272",
+    "project_id": "batsapp-6969",
+    "storage_bucket": "batsapp-6969.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:320232442272:android:2536895e1804d7c15f7cc5",
+        "android_client_info": {
+          "package_name": "com.example.baata"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "320232442272-rl6pef3opec78ejmojcvlk2ck11bg4t3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.baata",
+            "certificate_hash": "0e01712342926158824f82a7fdc2ee1d23af78a5"
+          }
+        },
+        {
+          "client_id": "320232442272-p483r6v6ur4fgjae59pbl415ggv1svp4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBB3eANWNxT1XS1KuXar5SQ_J6I_5gT9cU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "320232442272-p483r6v6ur4fgjae59pbl415ggv1svp4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "320232442272-nj7aj2b9keq3ln3b2lg1s8iv8u3colik.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.baata"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:320232442272:android:aac8f9f9def93ff15f7cc5",
+        "android_client_info": {
+          "package_name": "ml.baatacheet.baata"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "320232442272-88agadrf8fpq1d4a6fncml9aip0lsag7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ml.baatacheet.baata",
+            "certificate_hash": "40ab7de10d561eaed20c196d714665ebf7941fd2"
+          }
+        },
+        {
+          "client_id": "320232442272-p483r6v6ur4fgjae59pbl415ggv1svp4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBB3eANWNxT1XS1KuXar5SQ_J6I_5gT9cU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "320232442272-p483r6v6ur4fgjae59pbl415ggv1svp4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "320232442272-nj7aj2b9keq3ln3b2lg1s8iv8u3colik.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.baata"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

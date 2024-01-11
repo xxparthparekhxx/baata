@@ -12,13 +12,13 @@ class WelcomeScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
+          const Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       "Welcome to",
                       style:
@@ -36,9 +36,9 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                padding: EdgeInsets.symmetric(horizontal: 10),
                 child: Row(
-                  children: const [
+                  children: [
                     Text(
                       "Connect with",
                       style: TextStyle(fontSize: 24),
@@ -65,7 +65,7 @@ class WelcomeScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(15.0),
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.75,
-                        child: Row(
+                        child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
                             Icon(Icons.navigate_next),
